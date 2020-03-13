@@ -2,7 +2,7 @@
 
 The world has been hit with that dank angle, and everything is on a hill. You have to traverse through cities collecting items on a sick
 snowboard and make it to the end. Of course it wouldnt be an SSX game without some sick tricks and some nasty pipes to hit. You can also
-tag up the street with your own logo to signify that this is your territory! Ahoh Shred it BRO!
+tag up the street with your own logo to signify that this is your territory! **Ahoh Shred it BRO!**
 
 ## Features
 
