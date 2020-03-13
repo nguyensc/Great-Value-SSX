@@ -23,6 +23,9 @@ that STYLISH trick.
 
 ## Concept
 
-The whole concept of our game is for you to skate/snowboard down a hill, collecting items, and reach a high score by hitting tricks or
-collecting items. Our game is heavily physics based so most of our efforts went into getting that right and it's communicating to the
-server.
+The whole concept of our game is for you to snowboard down a hill, collecting items, and reach a high score by hitting tricks and
+collecting items. Our game is heavily physics based so most of our efforts went into getting that right and that it's communicating to the server.
+
+### Ending Remarks
+
+**AHOHOH SHRED IT BRO!**
