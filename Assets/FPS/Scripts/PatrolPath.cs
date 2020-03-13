@@ -10,9 +10,12 @@ public class PatrolPath : MonoBehaviour
 
     private void Start()
     {
-        foreach (var enemy in enemiesToAssign)
+        if (enemiesToAssign.Count > 1)
         {
-            enemy.patrolPath = this;
+            foreach (var enemy in enemiesToAssign)
+            {
+                enemy.patrolPath = this;
+            }
         }
     }
 

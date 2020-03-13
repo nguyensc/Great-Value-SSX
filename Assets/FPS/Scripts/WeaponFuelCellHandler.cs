@@ -28,6 +28,7 @@ public class WeaponFuelCellHandler : MonoBehaviour
     void Update()
     {
         // TODO: needs simplification
+        /*
         for (int i = 0; i < fuelCells.Length; i++)
         {
             float length = fuelCells.Length;
@@ -38,6 +39,6 @@ public class WeaponFuelCellHandler : MonoBehaviour
             value = Mathf.Clamp01(value);
 
             fuelCells[i].transform.localPosition = Vector3.Lerp(fuelCellUsedPosition, fuelCellUnusedPosition, value);
-        }
+        } */
     }
 }

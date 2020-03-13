@@ -427,7 +427,7 @@ MonoBehaviour:
   m_LastFolders:
   - Assets/FPS/Art/Materials/Level
   m_LastFoldersGridSize: 90
-  m_LastProjectPath: C:\Users\Scott\AppData\Local\Temp\2f2400aba8a58ec4297c078954193e24
+  m_LastProjectPath: C:\Users\xamro\AppData\Local\Temp\3e1155de373479044a08a043a1ed17f6
   m_LockTracker:
     m_IsLocked: 0
   m_FolderTreeState:

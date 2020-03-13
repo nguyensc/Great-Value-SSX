@@ -26,8 +26,8 @@ public class CrosshairManager : MonoBehaviour
 
     void Update()
     {
-        UpdateCrosshairPointingAtEnemy(false);
-        m_WasPointingAtEnemy = m_WeaponsManager.isPointingAtEnemy;
+        //UpdateCrosshairPointingAtEnemy(false);
+        //m_WasPointingAtEnemy = m_WeaponsManager.isPointingAtEnemy;
     }
 
     void UpdateCrosshairPointingAtEnemy(bool force)
@@ -69,10 +69,6 @@ public class CrosshairManager : MonoBehaviour
             if (nullCrosshairSprite)
             {
                 crosshairImage.sprite = nullCrosshairSprite;
-            }
-            else
-            {
-                crosshairImage.enabled = false;
             }
         }
 

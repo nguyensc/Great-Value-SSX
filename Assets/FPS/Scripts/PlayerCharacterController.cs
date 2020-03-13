@@ -12,7 +12,10 @@ public class PlayerCharacterController : MonoBehaviour
 
     [Header("General")]
     [Tooltip("Force applied downward when in the air")]
-    public float gravityDownForce = 20f;
+    public float grav = 2f;
+    public float weight = 2f;
+    public float gravityDownForce = 9.98f * 2f;
+
     [Tooltip("Physic layers checked to consider the player grounded")]
     public LayerMask groundCheckLayers = -1;
     [Tooltip("distance from the bottom of the character controller capsule to test for grounded")]
@@ -22,14 +25,14 @@ public class PlayerCharacterController : MonoBehaviour
     [Tooltip("Max movement speed when grounded (when not sprinting)")]
     public float maxSpeedOnGround = 10f;
     [Tooltip("Sharpness for the movement when grounded, a low value will make the player accelerate and decelerate slowly, a high value will do the opposite")]
-    public float movementSharpnessOnGround = 15;
+    public float movementSharpnessOnGround = 1;
     [Tooltip("Max movement speed when crouching")]
-    [Range(0,1)]
+    [Range(0, 1)]
     public float maxSpeedCrouchedRatio = 0.5f;
     [Tooltip("Max movement speed when not grounded")]
-    public float maxSpeedInAir = 15f;
+    public float maxSpeedInAir = 10f;
     [Tooltip("Acceleration speed when in the air")]
-    public float accelerationSpeedInAir = 30f;
+    public float accelerationSpeedInAir = 5f;
     [Tooltip("Multiplicator for the sprint speed (based on grounded speed)")]
     public float sprintSpeedModifier = 2f;
     [Tooltip("Height at which the player dies instantly when falling off the map")]
@@ -37,7 +40,7 @@ public class PlayerCharacterController : MonoBehaviour
 
     [Header("Rotation")]
     [Tooltip("Rotation speed for moving the camera")]
-    public float rotationSpeed = 200f;
+    public float rotationSpeed = 100f;
     [Range(0.1f, 1f)]
     [Tooltip("Rotation speed multiplier when aiming")]
     public float aimingRotationMultiplier = 0.4f;
@@ -74,13 +77,15 @@ public class PlayerCharacterController : MonoBehaviour
     [Tooltip("Whether the player will recieve damage when hitting the ground at high speed")]
     public bool recievesFallDamage;
     [Tooltip("Minimun fall speed for recieving fall damage")]
-    public float minSpeedForFallDamage = 10f;
+    public float minSpeedForFallDamage = 50f;
     [Tooltip("Fall speed for recieving th emaximum amount of fall damage")]
-    public float maxSpeedForFallDamage = 30f;
+    public float maxSpeedForFallDamage = 80f;
     [Tooltip("Damage recieved when falling at the mimimum speed")]
-    public float fallDamageAtMinSpeed = 10f;
+    public float fallDamageAtMinSpeed = 0f;
     [Tooltip("Damage recieved when falling at the maximum speed")]
-    public float fallDamageAtMaxSpeed = 50f;
+    public float fallDamageAtMaxSpeed = 0f;
+
+    public bool canVault = false;
 
     public UnityAction<bool> onStanceChanged;
 
@@ -101,11 +106,12 @@ public class PlayerCharacterController : MonoBehaviour
             return 1f;
         }
     }
-        
+
     Health m_Health;
     PlayerInputHandler m_InputHandler;
     CharacterController m_Controller;
     PlayerWeaponsManager m_WeaponsManager;
+    WeaponController m_WepController;
     Actor m_Actor;
     Vector3 m_GroundNormal;
     Vector3 m_CharacterVelocity;
@@ -114,9 +120,36 @@ public class PlayerCharacterController : MonoBehaviour
     float m_CameraVerticalAngle = 0f;
     float m_footstepDistanceCounter;
     float m_TargetCharacterHeight;
+    Vector3 vaultOrigin;
+    Vector3 vaultPosition;
 
-    const float k_JumpGroundingPreventionTime = 0.2f;
-    const float k_GroundCheckDistanceInAir = 0.07f;
+    // wall running
+    RaycastHit wallcheckR;
+    RaycastHit wallcheckL;
+    bool isWallR;
+    bool isWallL;
+    float wallRunVelocity = 0;
+
+    int state = 0;
+
+    // <<< PERFECT STRIDE >>>
+    float ps_velocity = 1f;
+    Vector3 ps_airVelocity;
+    float ps_friction = 0.1f;
+    public float ps_currDirectionAccel = 0f;
+    float ps_currDirection = 1f;
+    float slopeDir = 1;
+    public Vector3 verticalImpulse = Vector3.up;
+    float slopeImpulse = 1f;
+    bool onPipe = false;
+    bool onSlope = false;
+    float ps_pipeSlopeRotation = 0f;
+    public float rotation = 0f;
+    public Quaternion ps_initalRotation;
+
+
+    const float k_JumpGroundingPreventionTime = 0.4f;
+    const float k_GroundCheckDistanceInAir = 0.001f;
 
     void Start()
     {
@@ -136,6 +169,8 @@ public class PlayerCharacterController : MonoBehaviour
         m_Actor = GetComponent<Actor>();
         DebugUtility.HandleErrorIfNullGetComponent<Actor, PlayerCharacterController>(m_Actor, this, gameObject);
 
+        m_WepController = FindObjectOfType<WeaponController>();
+
         m_Controller.enableOverlapRecovery = true;
 
         m_Health.onDie += OnDie;
@@ -143,51 +178,76 @@ public class PlayerCharacterController : MonoBehaviour
         // force the crouch state to false when starting
         SetCrouchingState(false, true);
         UpdateCharacterHeight(true);
+
+        /// PERFECT STRIDE
+        ps_initalRotation = Quaternion.LookRotation(transform.forward, transform.up);
     }
 
     void Update()
     {
         // check for Y kill
-        if(!isDead && transform.position.y < killHeight)
+        if (!isDead && transform.position.y < killHeight)
         {
             m_Health.Kill();
         }
 
         hasJumpedThisFrame = false;
 
-        bool wasGrounded = isGrounded;
-        GroundCheck();
-
-        // landing
-        if (isGrounded && !wasGrounded)
+        // state machine
+        switch (state)
         {
-            // Fall damage
-            float fallSpeed = -Mathf.Min(characterVelocity.y, m_LatestImpactSpeed.y);
-            float fallSpeedRatio = (fallSpeed - minSpeedForFallDamage) / (maxSpeedForFallDamage - minSpeedForFallDamage);
-            if (recievesFallDamage && fallSpeedRatio > 0f)
-            {
-                float dmgFromFall = Mathf.Lerp(fallDamageAtMinSpeed, fallDamageAtMaxSpeed, fallSpeedRatio);
-                m_Health.TakeDamage(dmgFromFall, null);
+            case 0:
+                bool wasGrounded = isGrounded;
+                GroundCheck();
 
-                // fall damage SFX
-                audioSource.PlayOneShot(fallDamageSFX);
-            }
-            else
-            {
-                // land SFX
-                audioSource.PlayOneShot(landSFX);
-            }
+                // landing
+                if (isGrounded && !wasGrounded)
+                {
+                    // Fall damage
+
+                    float fallSpeed = -Mathf.Min(characterVelocity.y, m_LatestImpactSpeed.y);
+                    float fallSpeedRatio = (fallSpeed - minSpeedForFallDamage) / (maxSpeedForFallDamage - minSpeedForFallDamage);
+                    if (recievesFallDamage && fallSpeedRatio > 0f)
+                    {
+                        //float dmgFromFall = Mathf.Lerp(fallDamageAtMinSpeed, fallDamageAtMaxSpeed, fallSpeedRatio);
+                        //m_Health.TakeDamage(dmgFromFall, null);
+
+                        // fall damage SFX
+                        // audioSource.PlayOneShot(fallDamageSFX);
+                    }
+                    else
+                    {
+                        // land SFX
+                        audioSource.PlayOneShot(landSFX);
+                    }
+                }
+
+                // crouching
+                if (m_InputHandler.GetCrouchInputDown())
+                {
+                    SetCrouchingState(!isCrouching, false);
+                }
+
+                UpdateCharacterHeight(false);
+
+                HandleCharacterMovement();
+                break;
+
+            case 1:
+                vaultPosition = transform.position;
+                if (vaultPosition.z < vaultOrigin.z - 2f)
+                {
+                    state = 0;
+                    canVault = false;
+                }
+                else if (vaultPosition.z < vaultOrigin.z - 1f)
+                    transform.position = new Vector3(vaultPosition.x, vaultPosition.y, vaultPosition.z - 0.25f);
+                else
+                    transform.position = new Vector3(vaultPosition.x, vaultPosition.y + 0.1f, vaultPosition.z - 0.1f);
+                break;
+
         }
 
-        // crouching
-        if (m_InputHandler.GetCrouchInputDown())
-        {
-            SetCrouchingState(!isCrouching, false);
-        }
-
-        UpdateCharacterHeight(false);
-
-        HandleCharacterMovement();
     }
 
     void OnDie()
@@ -215,6 +275,9 @@ public class PlayerCharacterController : MonoBehaviour
             {
                 // storing the upward direction for the surface found
                 m_GroundNormal = hit.normal;
+                onPipe = hit.transform.tag == "Pipe";
+
+                Debug.Log(Vector3.Dot(hit.normal, transform.up));
 
                 // Only consider this a valid ground hit if the ground normal goes in the same direction as the character up
                 // and if the slope angle is lower than the character controller's limit
@@ -253,17 +316,19 @@ public class PlayerCharacterController : MonoBehaviour
             playerCamera.transform.localEulerAngles = new Vector3(m_CameraVerticalAngle, 0, 0);
         }
 
+
+
         // character movement handling
         bool isSprinting = m_InputHandler.GetSprintInputHeld();
         {
             if (isSprinting)
             {
-                isSprinting = SetCrouchingState(false, false);
-
-                if(!isGrounded)
+                if (!isGrounded)
                 {
                     maxSpeedInAir += 1f;
                 }
+
+                isSprinting = SetCrouchingState(false, false);
             }
 
             float speedModifier = isSprinting ? sprintSpeedModifier : 1f;
@@ -274,8 +339,40 @@ public class PlayerCharacterController : MonoBehaviour
             // handle grounded movement
             if (isGrounded)
             {
+                // check for able to start wallrunning
+                if (isSprinting)
+                {
+                    if (Physics.Raycast(transform.position, transform.right, out wallcheckR, 5))
+                    {
+                        if (wallcheckR.transform.tag == "Wall")
+                        {
+                            isWallR = true;
+                            isWallL = false;
+                        }
+                    }
+                    else if (Physics.Raycast(transform.position, -transform.right, out wallcheckL, 5))
+                    {
+                        if (wallcheckL.transform.tag == "Wall")
+                        {
+                            isWallL = true;
+                            isWallR = false;
+                        }
+                    }
+                    else
+                    {
+                        isWallR = false;
+                        isWallL = false;
+                    }
+                }
+                else
+                {
+                    isWallR = false;
+                    isWallL = false;
+                }
+
                 // calculate the desired velocity from inputs, max speed, and current slope
                 Vector3 targetVelocity = worldspaceMoveInput * maxSpeedOnGround * speedModifier;
+
                 // reduce speed if crouching by crouch speed ratio
                 if (isCrouching)
                     targetVelocity *= maxSpeedCrouchedRatio;
@@ -287,14 +384,28 @@ public class PlayerCharacterController : MonoBehaviour
                 // jumping
                 if (isGrounded && m_InputHandler.GetJumpInputDown())
                 {
+                    if (canVault)
+                    {
+                        state = 1;
+                        vaultOrigin = transform.position;
+                    }
                     // force the crouch state to false
-                    if (SetCrouchingState(false, false))
+                    else if (SetCrouchingState(false, false))
                     {
                         // start by canceling out the vertical component of our velocity
                         characterVelocity = new Vector3(characterVelocity.x, 0f, characterVelocity.z);
 
-                        // then, add the jumpSpeed value upwards
-                        characterVelocity += Vector3.up * jumpForce;
+
+                        if (isWallL || isWallR)
+                        {
+                            wallRunVelocity = 0;
+                            characterVelocity += Vector3.up * (jumpForce / 2);
+                        }
+                        else
+                        {
+                            // then, add the jumpSpeed value upwards
+                            characterVelocity += Vector3.up * jumpForce;
+                        }
 
                         // play sound
                         audioSource.PlayOneShot(jumpSFX);
@@ -323,6 +434,7 @@ public class PlayerCharacterController : MonoBehaviour
             // handle air movement
             else
             {
+
                 // add air acceleration
                 characterVelocity += worldspaceMoveInput * accelerationSpeedInAir * Time.deltaTime;
 
@@ -332,15 +444,105 @@ public class PlayerCharacterController : MonoBehaviour
                 horizontalVelocity = Vector3.ClampMagnitude(horizontalVelocity, maxSpeedInAir * speedModifier);
                 characterVelocity = horizontalVelocity + (Vector3.up * verticalVelocity);
 
-                // apply the gravity to the velocity
-                characterVelocity += Vector3.down * gravityDownForce * Time.deltaTime;
+                if (wallRunVelocity >= 0)
+                {
+                    characterVelocity += Vector3.down * wallRunVelocity * Time.deltaTime;
+                    wallRunVelocity += 0.25f;
+                    if (wallRunVelocity >= gravityDownForce)
+                    {
+                        wallRunVelocity = -1;
+                    }
+                }
+                else
+                {
+                    // apply the gravity to the velocity
+                    characterVelocity += -transform.up * gravityDownForce * Time.deltaTime;
+                }
             }
         }
 
         // apply the final calculated velocity value as a character movement
         Vector3 capsuleBottomBeforeMove = GetCapsuleBottomHemisphere();
         Vector3 capsuleTopBeforeMove = GetCapsuleTopHemisphere(m_Controller.height);
+
+
+        // <<< PERFECT STRIDE >>>
+        rotation = m_InputHandler.GetLookInputsHorizontal(); // get amount plyaer has looked
+
+        if (rotation == 0)
+        {
+            ps_currDirectionAccel = 0f;
+        }
+        else if (Mathf.Sign(ps_currDirection) != Mathf.Sign(rotation))
+        {
+            ps_currDirectionAccel = 0f;
+            ps_currDirection *= -1;
+        }
+        else
+        {
+            ps_currDirectionAccel = Mathf.Min(ps_currDirectionAccel + 0.03f, 0.15f);
+        }
+
+        ps_velocity += ps_currDirectionAccel;
+        characterVelocity = transform.forward * ps_velocity;
+
+        // handle rotation
+        float slopeAngle = Mathf.Round(Vector3.Angle(transform.up, m_GroundNormal));
+
+        // handle movement
+        if (!isGrounded)
+        {
+            
+            if (slopeImpulse > 1)
+            {
+               // verticalImpulse = new Vector3(0f, Mathf.Max(verticalImpulse.y * slopeImpulse - 1f, -10f), 0f);
+                characterVelocity = new Vector3(characterVelocity.x, 0f, characterVelocity.z);
+                slopeImpulse = 0f;
+                transform.rotation = Quaternion.LookRotation(transform.up, -transform.forward);
+            } else if (slopeImpulse < 1)
+            {
+                Quaternion rot = Quaternion.LookRotation(-transform.up, transform.forward);
+                transform.rotation = Quaternion.Lerp(transform.rotation, rot, 0.02f);
+            }
+            verticalImpulse = new Vector3(0f, Mathf.Max(verticalImpulse.y-1f, -10f), 0f);
+
+            characterVelocity += verticalImpulse;
+            ps_velocity = Mathf.Max(ps_velocity - ps_friction / 2, ps_friction / 2);
+        }
+        else
+        {
+
+            ps_velocity = Mathf.Max(ps_velocity - ps_friction, ps_friction);
+            verticalImpulse = transform.up * Mathf.Abs(Mathf.Sin(slopeAngle) * ps_velocity);
+            ps_currDirectionAccel = Mathf.Max(ps_currDirectionAccel + Mathf.Abs(Mathf.Sin(slopeAngle)) * slopeDir, 0f); 
+            /*
+            if (onPipe)
+            {
+                characterVelocity = new Vector3(Mathf.Max(characterVelocity.x - 5f, 0f), characterVelocity.y + slopeImpulse, Mathf.Max(characterVelocity.z - 5f, 0f));
+                slopeImpulse += 1f;
+                Quaternion rot = Quaternion.LookRotation(transform.up, -transform.forward);
+                transform.rotation = Quaternion.Lerp(transform.rotation, rot, 0.05f);
+            }
+            else
+            {
+                if (slopeImpulse < 1)
+                {
+                    slopeImpulse++;
+                }
+            }
+            */
+        }
+
+        float prevY = transform.position.y;
+
         m_Controller.Move(characterVelocity * Time.deltaTime);
+
+        if (prevY > transform.position.y)
+            slopeDir = 1;
+        else if (prevY < transform.position.y)
+            slopeDir = -1;
+        else slopeDir = 0;
+
 
         // detect obstructions to adjust velocity accordingly
         m_LatestImpactSpeed = Vector3.zero;
@@ -350,13 +552,16 @@ public class PlayerCharacterController : MonoBehaviour
             m_LatestImpactSpeed = characterVelocity;
 
             characterVelocity = Vector3.ProjectOnPlane(characterVelocity, hit.normal);
+            
         }
     }
 
     // Returns true if the slope angle represented by the given normal is under the slope angle limit of the character controller
     bool IsNormalUnderSlopeLimit(Vector3 normal)
     {
-        return Vector3.Angle(transform.up, normal) <= m_Controller.slopeLimit;
+        float maxSlope = m_Controller.slopeLimit;
+        maxSlope = 190;
+        return Vector3.Angle(transform.up, normal) <= maxSlope;
     }
 
     // Gets the center point of the bottom hemisphere of the character controller capsule    
