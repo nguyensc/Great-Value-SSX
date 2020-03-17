@@ -1,0 +1,11 @@
+C:\Users\alexj\source\repos\SurfsUpServer\SurfsUpServer\bin\Debug\netcoreapp2.2\SurfsUpServer.deps.json
+C:\Users\alexj\source\repos\SurfsUpServer\SurfsUpServer\bin\Debug\netcoreapp2.2\SurfsUpServer.runtimeconfig.json
+C:\Users\alexj\source\repos\SurfsUpServer\SurfsUpServer\bin\Debug\netcoreapp2.2\SurfsUpServer.runtimeconfig.dev.json
+C:\Users\alexj\source\repos\SurfsUpServer\SurfsUpServer\bin\Debug\netcoreapp2.2\SurfsUpServer.dll
+C:\Users\alexj\source\repos\SurfsUpServer\SurfsUpServer\bin\Debug\netcoreapp2.2\SurfsUpServer.pdb
+C:\Users\alexj\source\repos\SurfsUpServer\SurfsUpServer\obj\Debug\netcoreapp2.2\SurfsUpServer.csprojAssemblyReference.cache
+C:\Users\alexj\source\repos\SurfsUpServer\SurfsUpServer\obj\Debug\netcoreapp2.2\SurfsUpServer.csproj.CoreCompileInputs.cache
+C:\Users\alexj\source\repos\SurfsUpServer\SurfsUpServer\obj\Debug\netcoreapp2.2\SurfsUpServer.AssemblyInfoInputs.cache
+C:\Users\alexj\source\repos\SurfsUpServer\SurfsUpServer\obj\Debug\netcoreapp2.2\SurfsUpServer.AssemblyInfo.cs
+C:\Users\alexj\source\repos\SurfsUpServer\SurfsUpServer\obj\Debug\netcoreapp2.2\SurfsUpServer.dll
+C:\Users\alexj\source\repos\SurfsUpServer\SurfsUpServer\obj\Debug\netcoreapp2.2\SurfsUpServer.pdb
