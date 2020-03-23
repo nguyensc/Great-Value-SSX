@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Net;
 using System.Net.Sockets;
+using System.Numerics;
 
 namespace SurfsUpServer
 {
@@ -10,6 +11,7 @@ namespace SurfsUpServer
     {
         public static int dataBuffersize = 4096;
 
+        public player player;
         public int id;
         public TCP tcp;
         public UDP udp;
@@ -69,6 +71,7 @@ namespace SurfsUpServer
                     int byteLength = stream.EndRead(result);
                     if(byteLength <= 0)
                     {
+                        server.clients[id].Disconnect();
                         return;
                     }
                     byte[] data = new byte[byteLength];
@@ -82,6 +85,7 @@ namespace SurfsUpServer
                 catch(Exception ex)
                 {
                     Console.WriteLine(ex);
+                    server.clients[id].Disconnect();
                 }
             }
             private bool HandleData(byte[] data)
@@ -124,6 +128,14 @@ namespace SurfsUpServer
                 }
                 return false;
             }
+            public void Disconnect()
+            {
+                socket.Close();
+                stream = null;
+                receiveBuffer = null;
+                receivedData = null;
+                socket = null;
+            }
         }
 
         public class UDP
@@ -138,7 +150,6 @@ namespace SurfsUpServer
             public void Connect(IPEndPoint endP)
             {
                 endPoint = endP;
-                serversend.UDPTest(id);
             }
             public void SendData(packet pack)
             {
@@ -158,6 +169,42 @@ namespace SurfsUpServer
                     }
                 });
             }
+            public void Disconnect()
+            {
+                endPoint = null;
+            }
+        }
+
+        public void SendIntoGame(string playerName)
+        {
+            player = new player(id, playerName, new Vector3(0, 0, 0));
+
+            foreach (client cli in server.clients.Values)
+            {
+                if(cli.player != null)
+                {
+                    if(cli.id != id)
+                    {
+                        serversend.SpawnPlayer(id, cli.player);
+                    }
+                }
+            }
+            foreach (client cli in server.clients.Values)
+            {
+                if(cli.player != null)
+                {
+                    serversend.SpawnPlayer(cli.id, player);
+                }
+            }
+        }
+        private void Disconnect()
+        {
+            Console.WriteLine($"{tcp.socket.Client.RemoteEndPoint} has disconnected");
+
+            player = null;
+
+            tcp.Disconnect();
+            udp.Disconnect();
         }
     }
 }

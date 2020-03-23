@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Numerics;
 using System.Text;
 
 namespace SurfsUpServer
@@ -8,14 +9,17 @@ namespace SurfsUpServer
     public enum ServerPackets
     {
         welcome = 1,
-        udpTest
+        spawnPlayer,
+        playerPosition,
+        playerRotation
+        
     }
 
     /// <summary>Sent from client to server.</summary>
     public enum ClientPackets
     {
         welcomeReceived = 1,
-        udpTestReceive
+        playerMovement
     }
 
     public class packet : IDisposable
@@ -158,6 +162,19 @@ namespace SurfsUpServer
         {
             Write(_value.Length); // Add the length of the string to the packet
             buffer.AddRange(Encoding.ASCII.GetBytes(_value)); // Add the string itself
+        }
+        public void Write(Vector3 _value)
+        {
+            Write(_value.X);
+            Write(_value.Y);
+            Write(_value.Z);
+        }
+        public void Write(Quaternion _value)
+        {
+            Write(_value.X);
+            Write(_value.Y);
+            Write(_value.Z);
+            Write(_value.W);
         }
         #endregion
 
@@ -330,6 +347,15 @@ namespace SurfsUpServer
                 throw;
                 // throw new Exception("Could not read value of type 'string'!");
             }
+        }
+        public Vector3 ReadVector3(bool moveReadPos = true)
+        {
+            return new Vector3(ReadFloat(moveReadPos), ReadFloat(moveReadPos), ReadFloat(moveReadPos));
+        }
+
+        public Quaternion ReadQuaternion(bool moveReadPos = true)
+        {
+            return new Quaternion(ReadFloat(moveReadPos), ReadFloat(moveReadPos), ReadFloat(moveReadPos), ReadFloat(moveReadPos));
         }
         #endregion
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Numerics;
 using System.Text;
 
 namespace SurfsUpServer
@@ -16,12 +17,19 @@ namespace SurfsUpServer
             {
                 Console.WriteLine($"Player {username} has assumed the wrong client id");
             }
-           //TODO: send player into game
+            server.clients[fromClient].SendIntoGame(username);
         }
-        public static void UDPTestReceived(int fromClient, packet pack)
+
+        public static void PlayerMovement(int fromClient, packet pack)
         {
-            string msg = pack.ReadString();
-            Console.WriteLine($"UDPTestReceived {msg}");
+            bool[] inputs = new bool[pack.ReadInt()];
+            for (int i = 0; i < inputs.Length; i++)
+            {
+                inputs[i] = pack.ReadBool();
+            }
+            Quaternion rotation = pack.ReadQuaternion();
+
+            server.clients[fromClient].player.SetInput(inputs, rotation);
         }
     }
 }

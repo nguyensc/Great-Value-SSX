@@ -108,7 +108,7 @@ namespace SurfsUpServer
             packetHandlers = new Dictionary<int, PacketHandler>()
             {
                 { (int)ClientPackets.welcomeReceived, serverHandle.WelcomeReceived },
-                { (int)ClientPackets.udpTestReceive, serverHandle.UDPTestReceived }
+                { (int)ClientPackets.playerMovement, serverHandle.PlayerMovement }
             };
             Console.WriteLine("Initialization done");
         }

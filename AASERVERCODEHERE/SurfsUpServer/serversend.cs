@@ -68,12 +68,37 @@ namespace SurfsUpServer
             }
 
         }
-        public static void UDPTest(int toClient)
+        public static void SpawnPlayer(int toClient, player play)
         {
-            using (packet pack = new packet((int)ServerPackets.udpTest))
+            using (packet pack = new packet((int)ServerPackets.spawnPlayer))
             {
-                pack.Write("Testing UDP");
-                SendUDPData(toClient, pack);
+                pack.Write(play.id);
+                pack.Write(play.username);
+                pack.Write(play.position);
+                pack.Write(play.rotation);
+
+                SendTCPData(toClient, pack);
+            }
+        }
+        public static void PlayerPosition(player play)
+        {
+            using (packet pack = new packet((int)ServerPackets.playerPosition))
+            {
+                pack.Write(play.id);
+                pack.Write(play.position);
+
+                SendUDPDataToAll(pack);
+            }
+        }
+
+        public static void PlayerRotation(player play)
+        {
+            using (packet pack = new packet((int)ServerPackets.playerRotation))
+            {
+                pack.Write(play.id);
+                pack.Write(play.rotation);
+
+                SendUDPDataToAll(play.id, pack);
             }
         }
     }
