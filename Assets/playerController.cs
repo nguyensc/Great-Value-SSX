@@ -180,6 +180,8 @@ public class playerController : MonoBehaviour
         }
         
         currentMouseAccel = Input.GetAxis("Mouse X");
+        //Send the above input to server
+
         transform.RotateAround(transform.position, Vector3.up, currentMouseAccel * rotationSpeed * Time.deltaTime);
 
         CalculateAcceleration();
@@ -222,5 +224,7 @@ public class playerController : MonoBehaviour
         {
             transform.rotation = Quaternion.Lerp(transform.rotation, Quaternion.LookRotation(Vector3.Cross(transform.right, groundNormal)), 0.75f);
         }
+        //Send transform.rotation to server? Probably more like rb.rotation
+        //Send rb.position to the server
     }
 }
