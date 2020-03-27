@@ -24,6 +24,11 @@ public class clientSend : MonoBehaviour
         {
             pack.Write(client.instance.myId);
             pack.Write(UIManager.instance.usernameField.text);
+            //this is where we write the usernameField to the server
+            //meanwhile the gameManager writes the ID and username to the input when a player is spawned in
+            //we don't need to write the IP to the server, but we do need it for connection
+            // // I guess it could be hardcoded but that wouldn't be as cool
+            //Especially if my IP is ephemeral, which it probably is
             SendTCPData(pack);
         }
     }

@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using System.Net;
 using System.Net.Sockets;
 using System;
@@ -11,6 +12,7 @@ public class client : MonoBehaviour
     public static int dataBufferSize = 4096;
 
     public string ip = "67.167.183.119";
+    //public string ip = UIManager.instance.ipField.text; //pull the ip from the field
     public int port = 101298;
     public int myId = 0;
     public TCP tcp;
@@ -47,6 +49,7 @@ public class client : MonoBehaviour
     {
         InitializeClientData();
         isConnected = true;
+        Debug.Log("Trying to connect");
         tcp.Connect();
 
     }

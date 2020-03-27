@@ -6,4 +6,5 @@ public class playerManager : MonoBehaviour
 {
     public int id;
     public string username;
+    public string ip;
 }

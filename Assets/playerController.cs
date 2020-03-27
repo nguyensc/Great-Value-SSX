@@ -155,6 +155,9 @@ public class playerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+
+        //if menu is open, rb.velocity = Vector3.zero;
+        //return
         GroundCheck();
         CollectableCheck();
 

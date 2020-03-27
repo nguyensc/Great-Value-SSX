@@ -25,9 +25,11 @@ public class UIManager : MonoBehaviour
 
     public void ConnectToServer()
     {
+        Debug.Log("The button was pressed");
         startMenu.SetActive(false);
         usernameField.interactable = false;
         ipField.interactable = false;
+        //Debug.Log("Button was pressed");
         client.instance.ConnectToServer();
     }
 }

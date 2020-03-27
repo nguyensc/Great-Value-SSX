@@ -6,7 +6,7 @@ public class camController : MonoBehaviour
 
     void Start()
     {
-        Cursor.lockState = CursorLockMode.Locked; // hide the cursor
+        //Cursor.lockState = CursorLockMode.Locked; // hide the cursor
         player = FindObjectOfType<playerController>();
     }
     
