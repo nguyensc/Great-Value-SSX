@@ -4,8 +4,9 @@ using UnityEngine;
 
 public class guiRightArrowController : MonoBehaviour
 {
-    playerController player;
-    RectTransform rect;
+    static playerController player;
+    static RectTransform rect;
+    static bool playerConnected = false;
 
     float deltaPos = 0.5f;
     float offsetx = 0f;
@@ -13,7 +14,7 @@ public class guiRightArrowController : MonoBehaviour
     
     void Start()
     {
-        player = FindObjectOfType<playerController>();
+        //player = FindObjectOfType<playerController>();
         rect = GetComponent<RectTransform>();
 
         //originalPosX = transform.position.x;
@@ -22,20 +23,36 @@ public class guiRightArrowController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
-        if (player.GetAccelerationVector() > 0)
+        if(playerConnected)
         {
-            offsetx = Mathf.Min(offsetx + deltaPos, 75f); 
+            if (player.GetAccelerationVector() > 0)
+            {
+                offsetx = Mathf.Min(offsetx + deltaPos, 75f);
+            }
+            else if (player.GetAccelerationVector() == 0)
+            {
+                offsetx = Mathf.Max(offsetx - deltaPos * 2, 0f);
+            }
+            else
+            {
+                offsetx = Mathf.Max(offsetx - deltaPos * 10, 0f);
+            }
+            rect.localPosition = new Vector3(originalPosX + offsetx, rect.localPosition.y, rect.localPosition.z);
         }
-        else if (player.GetAccelerationVector() == 0)
+
+    }
+
+    public static void getPlayer()
+    {
+        player = FindObjectOfType<playerController>();
+        playerConnected = true;
+        Debug.Log("Got player for right arrow");
+    }
+    public static void setPlayerConnectedFalse(int id)
+    {
+        if (client.instance.myId == id)
         {
-            offsetx = Mathf.Max(offsetx - deltaPos * 2, 0f); 
+            playerConnected = false;
         }
-        else
-        {
-            offsetx = Mathf.Max(offsetx - deltaPos * 10, 0f); 
-        } 
-        rect.localPosition = new Vector3(originalPosX + offsetx, rect.localPosition.y, rect.localPosition.z);  
-        
     }
 }

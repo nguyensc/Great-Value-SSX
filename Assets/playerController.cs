@@ -27,11 +27,18 @@ public class playerController : MonoBehaviour
 
     bool onGround = false;
 
+    public bool[] toSend =
+    {
+            //We don't want anything in here because the server is not deciding the position of the player
+    };
+
     // Start is called before the first frame update
     void Start()
     {
         // set up rigidbody interface
         rb = GetComponent<Rigidbody>();
+
+        //have a rigidbody g
 
         // set up camera
         camera = FindObjectOfType<Camera>();
@@ -105,7 +112,7 @@ public class playerController : MonoBehaviour
         r.origin = transform.position;
         r.direction = -camera.transform.up;
         
-        Debug.Log(r.direction);
+        //Debug.Log(r.direction);
         Debug.DrawRay(r.origin, r.direction, Color.magenta, 1f); 
         
         if (Physics.Raycast(camera.transform.position, -camera.transform.up, out RaycastHit hit, 1.125f)){
@@ -229,5 +236,14 @@ public class playerController : MonoBehaviour
         }
         //Send transform.rotation to server? Probably more like rb.rotation
         //Send rb.position to the server
+        
+        
+        //maybe change this method to send position and rotation rather than pulling it from somewhere else
+
+    }
+
+    void FixedUpdate()
+    {
+        clientSend.PlayerMovement(toSend);
     }
 }
