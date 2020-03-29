@@ -37,6 +37,15 @@ public class gameManager : MonoBehaviour
         playerObj.GetComponent<playerManager>().id = ID;
         playerObj.GetComponent<playerManager>().username = username;
         players.Add(ID, playerObj.GetComponent<playerManager>());
+
+        guiRightArrowController.setPlayerConnectedFalse(ID);
+        guiLeftArrowController.setPlayerConnectedFalse(ID);
+        guiSpeedCounterController.setPlayerConnectedFalse(ID);
+
+        guiRightArrowController.getPlayer();
+        guiLeftArrowController.getPlayer();
+        guiSpeedCounterController.getPlayer();
+        Debug.Log("Got all the players");
     }
 
 }

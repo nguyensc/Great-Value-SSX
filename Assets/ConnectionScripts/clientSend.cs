@@ -40,6 +40,7 @@ public class clientSend : MonoBehaviour
         //This needs to be modified so that it sends rotation values instead of booleans
         using (packet pack = new packet((int)ClientPackets.playerMovement))
         {
+            //This for loop should never run
             pack.Write(input.Length);
             foreach (bool apple in input)
             {
@@ -51,7 +52,12 @@ public class clientSend : MonoBehaviour
             //For now, just keep it at this
             //this method should be called in the playerController. The rotation is pulled from the gameManager
             //the game manager gets the data for the players in each client handle method
+
+            //The position values and rotations might need to get pulled from a rigidbody
+            //if that's the case, we need to create a rigidbody on spawn and assign it to the 
+            //player manager.
             pack.Write(gameManager.players[client.instance.myId].transform.rotation);
+            pack.Write(gameManager.players[client.instance.myId].transform.position);
 
             SendUDPData(pack);
         }

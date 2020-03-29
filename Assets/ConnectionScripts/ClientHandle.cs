@@ -34,14 +34,23 @@ public class ClientHandle : MonoBehaviour
         int id = pack.ReadInt();
         Vector3 position = pack.ReadVector3();
 
-        gameManager.players[id].transform.position = position;
+        if(client.instance.myId != id)
+        {
+            gameManager.players[id].transform.position = position;
+        }
+        
     }
     public static void PlayerRotation(packet pack)
     {
         int id = pack.ReadInt();
         Quaternion rotation = pack.ReadQuaternion();
 
-        gameManager.players[id].transform.rotation = rotation;
+        if(client.instance.myId != id)
+        {
+            gameManager.players[id].transform.rotation = rotation;
+        }
+        
+        
     }
     //Might be able to convert this to just one method that takes the entire rigidbody and pulls the rotation and stuff from it.
 }
