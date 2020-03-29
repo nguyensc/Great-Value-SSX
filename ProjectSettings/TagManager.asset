@@ -5,6 +5,20 @@ TagManager:
   serializedVersion: 2
   tags:
   - Collectable
+  - Rail
+  - Marker5
+  - Marker4
+  - Marker3
+  - Marker2
+  - Marker1
+  - Marker0
+  - Ramp
+  - LMarker5
+  - LMarker4
+  - LMarker3
+  - LMarker2
+  - LMarker1
+  - LMarker0
   layers:
   - Default
   - TransparentFX
