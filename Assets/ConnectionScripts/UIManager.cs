@@ -29,7 +29,7 @@ public class UIManager : MonoBehaviour
         startMenu.SetActive(false);
         usernameField.interactable = false;
         ipField.interactable = false;
-        //Debug.Log("Button was pressed");
+
         client.instance.ConnectToServer();
     }
 }

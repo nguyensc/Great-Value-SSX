@@ -244,6 +244,10 @@ public class playerController : MonoBehaviour
 
     void FixedUpdate()
     {
-        clientSend.PlayerMovement(toSend);
+        if(gameManager.instance.gotConnection)
+        {
+            clientSend.PlayerMovement(toSend);
+            Debug.Log("Sending data");
+        }
     }
 }

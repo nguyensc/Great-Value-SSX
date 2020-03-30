@@ -10,6 +10,8 @@ public class gameManager : MonoBehaviour
 
     public GameObject localPlayerPrefab;
     public GameObject playerPrefeb;
+    public GameObject currentLocalPlayer;
+    public bool gotConnection = false;
     private void Awake()
     {
         if (instance == null)
@@ -27,6 +29,7 @@ public class gameManager : MonoBehaviour
         GameObject playerObj;
         if (ID == client.instance.myId)
         {
+            Destroy(currentLocalPlayer);
             playerObj = Instantiate(localPlayerPrefab, position, rotation);
         }
         else
@@ -45,7 +48,10 @@ public class gameManager : MonoBehaviour
         guiRightArrowController.getPlayer();
         guiLeftArrowController.getPlayer();
         guiSpeedCounterController.getPlayer();
-        Debug.Log("Got all the players");
+
+        //Debug.Log("Got all the players");
+
+        gotConnection = true;
     }
 
 }
