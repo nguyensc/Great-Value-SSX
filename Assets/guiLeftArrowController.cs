@@ -7,7 +7,7 @@ public class guiLeftArrowController : MonoBehaviour
     playerController player;
     RectTransform rect;
 
-    float deltaPos = 0.5f;
+    float deltaPos = 25f;
     float offsetx = 0f;
     float originalPosX = -10f;
     
@@ -25,15 +25,15 @@ public class guiLeftArrowController : MonoBehaviour
         
         if (player.GetAccelerationVector() < 0)
         {
-            offsetx = Mathf.Max(offsetx - deltaPos, -75f); 
+            offsetx = Mathf.Max(offsetx - deltaPos * Time.deltaTime, -100f); 
         }
         else if (player.GetAccelerationVector() == 0)
         {
-            offsetx = Mathf.Min(offsetx + deltaPos * 2, 0f);
+            offsetx = Mathf.Min(offsetx + deltaPos * 2 * Time.deltaTime, 0f);
         }
         else
         {
-            offsetx = Mathf.Min(offsetx + deltaPos * 10, 0f); 
+            offsetx = Mathf.Min(offsetx + deltaPos * 5 * Time.deltaTime, 0f); 
         } 
         rect.localPosition = new Vector3(originalPosX + offsetx, rect.localPosition.y, rect.localPosition.z);  
         

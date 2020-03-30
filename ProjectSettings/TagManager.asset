@@ -19,6 +19,7 @@ TagManager:
   - LMarker2
   - LMarker1
   - LMarker0
+  - Player1
   layers:
   - Default
   - TransparentFX

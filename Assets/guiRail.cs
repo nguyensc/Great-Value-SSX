@@ -51,11 +51,6 @@ public class guiRail : MonoBehaviour
 
         }
 
-        if (player.spinDebug > 0)
-        {
-            text.text = "LIVE ASS SPIN GOOMBA\n";
-        }
-        
         return;
     }
 }

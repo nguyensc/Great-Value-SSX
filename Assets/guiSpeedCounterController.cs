@@ -18,7 +18,7 @@ public class guiSpeedCounterController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        text.text = "hVelocity: " + player.hVelocity.ToString() + "\nslopeSpeed: " + player.getSlopeSpeed().ToString() + "\nverticalImpulse: " + player.getVerticalImpulse().ToString() + "\naccel (vector): " + player.GetAccelerationVector().ToString();
+        text.text = "hVelocity: " + player.getCurrentVelocity().ToString() + "\nslopeSpeed: " + player.getSlopeSpeed().ToString() + "\nverticalImpulse: " + player.getVerticalImpulse().ToString() + "\naccel (vector): " + player.GetAccelerationVector().ToString();
         return;
     }
 }

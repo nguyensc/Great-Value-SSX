@@ -13,6 +13,7 @@ public class playerController : MonoBehaviour
 
     Vector3 groundNormal;
 
+    // trick state vars
     public enum trickStates {
         NONE,
         ON_RAMP,
@@ -20,18 +21,14 @@ public class playerController : MonoBehaviour
         SPIN
     }
     public trickStates trickState;
-    float prevAccelDir = 1f;
-    public float spinDebug = 0f;
-    int spinSetupTimer = 3;
-    int spinTimer = 3;
     public int spinCounter = 0;
     float currentSpinRot = 0f;
     float currentSpinVector = 1f;
-    Quaternion preSpinRotation; 
+    float rightMomentum = -1f;
+    float leftMomentum = -1f;
 
+    // movement vars
     public float currentMouseAccel = 0f;
-    public float hVelocity = 0f;
-    float hVelocityMin = 0f;
     float normalRotationSpeed = 100f;
     float slopeRotationSpeed = 85f;
     float rotationSpeed = 100f;
@@ -51,16 +48,27 @@ public class playerController : MonoBehaviour
     float finalAcceleration = 10f;
     float currentAcceleration = 0f;
     float deceleration = 30f;
+    
+    // non trick-momentum vars
     float momentum = 0f;
     float dischargedMomentum = 0f;
     float initialMomentum = 0f;
     float finalMomentum = 5f;
-    float rightMomentum = -1f;
-    float leftMomentum = -1f;
-    float totalSpinRot = 0f;
 
+    
+    // spawn related vars
+    Vector3 spawnCoords;
+    Vector3 spawnNormal;
+    Quaternion spawnRot;
+    bool drank = false;
+    float drankHeldDown = 0f;
+    float spawnHVelocity = 0f;
+    float spawnAccelDir = 1f;
+    float spawnAcceleration = 0f;
+    float spawnVerticalImpulse = 0f;
+
+    public bool onRail = false;
     bool onGround = false;
-    bool onRail = false;
     bool onRamp = false;
     bool crouched = false;
 
@@ -96,17 +104,28 @@ public class playerController : MonoBehaviour
             guiLeftMarkers[i].SetActive(false);
         }
 
+        spawnCoords = transform.position + Vector3.up;
+        spawnRot = transform.rotation;
+        spawnNormal = Vector3.up;
+
         groundNormal = Vector3.up;
 
         trickState = trickStates.NONE;
     }
 
 
+    /** Getters **/
+
     // returns accel with the context of accelDir
     // mostly used by the arrows in gui
     public float GetAccelerationVector()
     {
         return currentAcceleration * accelDir;
+    }
+
+    public float getCurrentVelocity()
+    {
+        return currentHVelocity;
     }
 
     public float getSlopeSpeed()
@@ -124,6 +143,11 @@ public class playerController : MonoBehaviour
         return onRail;
     }
 
+    public bool getDrank()
+    {
+        return drank;
+    }
+
     // works like copysign but will return a 0 if the input is 0
     float GetZero(float f)
     {
@@ -136,6 +160,8 @@ public class playerController : MonoBehaviour
             return Mathf.Sign(f);
         }
     }
+
+    /*** world state checks ***/
 
     bool CollectableCheck()
     {
@@ -178,7 +204,7 @@ public class playerController : MonoBehaviour
         
         Debug.DrawRay(r.origin, r.direction, Color.magenta, 1f); 
         
-        if (Physics.Raycast(camera.transform.position, -camera.transform.up, out RaycastHit hit, 1f)){
+        if (Physics.Raycast(camera.transform.position, -camera.transform.up, out RaycastHit hit, 1.25f)){
             onGround = true;
             groundNormal = hit.normal;
             
@@ -198,7 +224,7 @@ public class playerController : MonoBehaviour
 
     bool CollisionCheck()
     {
-        if (Physics.Raycast(camera.transform.position, camera.transform.forward, out RaycastHit hit, 1f)){
+        if (Physics.Raycast(camera.transform.position, camera.transform.forward, out RaycastHit hit, 1.5f)){
             groundNormal = Vector3.up;
 
             trickState = trickStates.NONE;
@@ -209,31 +235,33 @@ public class playerController : MonoBehaviour
         return false;
     }
 
-    void calculateVerticalImpulse()
+    /*** movement calculations ***/
+
+    void CalculateVerticalImpulse()
     {
+        Debug.Log(angle);
+
         if (onGround)
         {
-            if (angle == 0)
+            if (onRamp)
             {
-                verticalImpulse = 0f;
+                verticalImpulse = (Mathf.Sin(Mathf.Abs(angle) * Mathf.Deg2Rad) * currentHVelocity);
             }
             else
             {
-                verticalImpulse = (Mathf.Sin(angle * Mathf.Deg2Rad) * currentHVelocity * 5f) * Time.deltaTime;
+                verticalImpulse = 0f;
             }
         }
         else
         {
             // make the amount of upwards speed decrease, eventually becoming negative and add onto gravity's effect
-            verticalImpulse = Mathf.Lerp(verticalImpulse, dischargedMomentum + verticalImpulse - rb.mass, 0.25f);
+            verticalImpulse -= gravity * Time.deltaTime;
         }
         
     }
 
     void CalculateAcceleration()
     {
-        prevAccelDir = accelDir;
-
         // movement speed calculations
         if (Mathf.Sign(currentMouseAccel) != accelDir)
         {
@@ -246,9 +274,7 @@ public class playerController : MonoBehaviour
             currentAcceleration = initialAcceleration;
         }
         else
-        {
-            currentAcceleration = Mathf.Min(currentAcceleration + (5f * Time.deltaTime), finalAcceleration);
-        }
+        { 
 
         // angle speed calculations
         if (angle > 0)
@@ -257,6 +283,7 @@ public class playerController : MonoBehaviour
         }
 
     }
+    
 
     void CalculateMomentum()
     {
@@ -280,6 +307,89 @@ public class playerController : MonoBehaviour
     }
 
 
+    void CalculateVelocity()
+    {
+        // no friction or slopeSpeed slow down when on a rail
+        if (currentAcceleration > 0)
+        {
+            currentHVelocity = currentHVelocity + (currentAcceleration * Time.deltaTime);
+            currentHVelocity = Mathf.Clamp(currentHVelocity, initialVelocity, finalVelocity);
+        }
+        else
+        {
+            if (currentAcceleration < 0)
+            {
+                currentHVelocity = currentHVelocity + (currentAcceleration * Time.deltaTime);
+                currentHVelocity = Mathf.Clamp(currentHVelocity, -5f, finalVelocity);
+            }
+            else
+            {
+                float dragForce = deceleration;
+                if (onRail)
+                {
+                    dragForce = 0f;
+                }
+                else if (!onGround)
+                {
+                    dragForce = 1f;
+                }
+                currentHVelocity = currentHVelocity - (dragForce * Time.deltaTime);
+                currentHVelocity = Mathf.Clamp(currentHVelocity, initialVelocity, finalVelocity);
+            }            
+        }
+    }
+
+    /*** etc ***/
+    public void SetSpawnCoords()
+    { 
+        spawnCoords = transform.position + Vector3.up;
+        spawnRot = transform.rotation;
+        spawnHVelocity = currentHVelocity;
+        spawnAccelDir = accelDir;
+        spawnAcceleration = currentAcceleration;
+        spawnVerticalImpulse = verticalImpulse;
+        spawnNormal = groundNormal;
+    }
+
+    void Respawn()
+    {
+        transform.position = spawnCoords;
+        transform.rotation = spawnRot;
+        currentHVelocity = spawnHVelocity;
+        accelDir = spawnAccelDir;
+        currentAcceleration = spawnAcceleration;
+        verticalImpulse = spawnVerticalImpulse;
+        groundNormal = spawnNormal;
+    }
+
+    void GetInputs()
+    {
+        currentMouseAccel = Input.GetAxis("Mouse X");
+
+        drank = false;
+        if (Input.GetKey(KeyCode.Tab))
+        {
+            drankHeldDown++;
+
+            if (drankHeldDown > 20 && drankHeldDown < 40)
+            {
+                
+                drank = true;
+            }
+        }
+        else if (drankHeldDown > 20)
+        {
+            drankHeldDown = 0f;
+        }
+        else if (drankHeldDown > 5)
+        {
+            drankHeldDown = 0f;
+            Respawn();
+        }
+        
+    }
+
+
     void Update()
     {
         // initial world detections here
@@ -289,10 +399,13 @@ public class playerController : MonoBehaviour
         // trick state machine
         switch (trickState)
         {
-            case (trickStates.NONE):
+            case (trickStates.NONE):               
                 // when the player is on a ramp enter a new state
                 if (onRamp)
                 {
+                    // ensure both right/left momentum are reset
+                    leftMomentum = -1f; 
+                    rightMomentum = -1f;
                     trickState = trickStates.ON_RAMP;
                 }
                 break;
@@ -312,7 +425,7 @@ public class playerController : MonoBehaviour
                     else if (leftMomentum > rightMomentum && rightMomentum >= 1f && leftMomentum >= 3f)
                     {
                         currentSpinRot = 360;
-                        currentSpinVector = -1f;
+                        currentSpinVector = 1f;
                         trickState = trickStates.SPIN;
                     }
                     // no trick conditions met
@@ -409,9 +522,9 @@ public class playerController : MonoBehaviour
                     
                     transform.RotateAround(transform.position, transform.up, currentSpinVector * currentSpinRot * (rotationSpeed / 100) * Time.deltaTime * currentMouseAccel);
 
-                    rb.velocity += (Vector3.up * verticalImpulse + Physics.gravity * rb.mass) * Time.deltaTime; 
+                    rb.velocity += (Vector3.up * verticalImpulse + Physics.gravity * rb.mass) * Time.deltaTime * 2; 
 
-                    calculateVerticalImpulse();
+                    CalculateVerticalImpulse();
 
                     return;
                 }
@@ -439,9 +552,10 @@ public class playerController : MonoBehaviour
         }
         
         // get inputs
-        currentMouseAccel = Input.GetAxis("Mouse X");
+        GetInputs();
         
-        transform.RotateAround(transform.position, Vector3.up, currentMouseAccel * rotationSpeed * Time.deltaTime); // rotate player horizontally
+        // rotate player horizontally based on input
+        transform.RotateAround(transform.position, Vector3.up, currentMouseAccel * rotationSpeed * Time.deltaTime); 
 
         // handle crouching
         if (onGround)
@@ -456,7 +570,7 @@ public class playerController : MonoBehaviour
             }
             else
             {
-                verticalImpulse += 0.1f * Mathf.Abs(slopeSpeed) * hVelocity;
+                verticalImpulse += 0.1f * Mathf.Abs(slopeSpeed) * currentHVelocity;
                 if (Input.GetMouseButtonUp(0) == true)
                 {
                     onGround = false;
@@ -468,42 +582,19 @@ public class playerController : MonoBehaviour
             crouched = false;
         }
 
-        CalculateAcceleration();
-        CalculateMomentum();
-        calculateVerticalImpulse();
 
         // calculate any angle caused by a slope
         angle = Vector3.SignedAngle(Vector3.up, groundNormal, transform.right);
-        
-        // no friction or slopeSpeed slow down when on a rail
-        if (currentAcceleration > 0)
-        {
-            currentHVelocity = currentHVelocity + (currentAcceleration * Time.deltaTime);
-            currentHVelocity = Mathf.Clamp(currentHVelocity, initialVelocity, finalVelocity);
-        }
-        else
-        {
-            if (currentAcceleration < 0)
-            {
-                currentHVelocity = currentHVelocity + (currentAcceleration * Time.deltaTime);
-                currentHVelocity = Mathf.Clamp(currentHVelocity, -5f, finalVelocity);
-            }
-            else
-            {
-                float dragForce = deceleration;
-                if (onRail)
-                {
-                    dragForce = 0f;
-                }
-                else if (!onGround)
-                {
-                    dragForce = 1f;
-                }
-                currentHVelocity = currentHVelocity - (dragForce * Time.deltaTime);
-                currentHVelocity = Mathf.Clamp(currentHVelocity, initialVelocity, finalVelocity);
-            }            
-        }
 
+        // calculate current movement values
+        CalculateAcceleration();
+        
+        CalculateMomentum();
+        
+        CalculateVerticalImpulse();
+        
+        CalculateVelocity();
+        
         // set rigidbody velocities
         rb.angularVelocity = Vector3.zero; // we are not using angular velocity so just reset it (makes sure player rigidbody doesnt tip over!!)
         rb.velocity = camera.transform.forward * (currentHVelocity) - camera.transform.forward * (slopeSpeed); // set horizontal velocity to the current velocity
@@ -511,6 +602,7 @@ public class playerController : MonoBehaviour
         // additional context based movement calculations
         if (!onGround)
         {
+
             rb.velocity += Vector3.up * verticalImpulse + Physics.gravity * rb.mass; // calculate the vertical velocity at this moment in the air
 
             groundNormal = Vector3.up; // reset the angle to align with, so the player is not stuck as the angle from the previous slope
@@ -518,10 +610,10 @@ public class playerController : MonoBehaviour
             // slowly rotate forwards while in the air
             Vector3 eulers = this.transform.rotation.eulerAngles;
 
-            float newEulerX = Mathf.Min(eulers.x + 0.1f, maxAirRotation);
+            float newEulerX = Mathf.Min(eulers.x + 5f * Time.deltaTime, maxAirRotation);
 
             Quaternion newRotation = Quaternion.Euler(new Vector3(newEulerX,eulers.y,eulers.z));
-            transform.rotation = Quaternion.Lerp(transform.rotation, newRotation, 0.5f);
+            transform.rotation = Quaternion.Lerp(transform.rotation, newRotation, 0.75f);
         }
         else
         {
