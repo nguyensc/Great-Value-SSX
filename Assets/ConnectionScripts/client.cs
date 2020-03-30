@@ -78,7 +78,7 @@ public class client : MonoBehaviour
         private void ConnectCallback(IAsyncResult result)
         {
             socket.EndConnect(result);
-
+            Debug.Log("Got a connection");
             if (!socket.Connected)
             {
                 Debug.Log("Didn't connect");
