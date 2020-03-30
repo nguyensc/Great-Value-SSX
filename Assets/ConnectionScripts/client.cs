@@ -13,7 +13,7 @@ public class client : MonoBehaviour
 
     public string ip = "67.167.183.119";
     //public string ip = UIManager.instance.ipField.text; //pull the ip from the field
-    public int port = 101298;
+    public int port = 46400;
     public int myId = 0;
     public TCP tcp;
     public UDP udp;
