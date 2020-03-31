@@ -49,6 +49,7 @@ public class playerController : MonoBehaviour
     float accelerationResetTimer = 1f;
     float accelerationResetCounter = 1f;
     float currentAcceleration = 0f;
+    float currentAngularAcceleration = 0f;
     float deceleration = 30f;
     
     // non trick-momentum vars
@@ -104,8 +105,9 @@ public class playerController : MonoBehaviour
             guiRightMarkers[i].SetActive(false);
         }
 
-        guiLeftMarkers = new GameObject[6];
-        for (int i=0; i<6; ++i)
+        */
+        guiLeftMarkers = new GameObject[7];
+        for (int i=0; i<=6; ++i)
         {
             guiLeftMarkers[i] = GameObject.FindWithTag("LMarker" + i.ToString());
             // shift their positions over a bit
@@ -114,7 +116,6 @@ public class playerController : MonoBehaviour
             // hide each marker
             guiLeftMarkers[i].SetActive(false);
         }
-        */
 
         spawnCoords = transform.position + Vector3.up;
         spawnRot = transform.rotation;
@@ -227,6 +228,7 @@ public class playerController : MonoBehaviour
             }
             else if (hit.transform.tag == "Ramp")
             {
+                Debug.Log("HIT");
                 onRamp = true;
             }
 
@@ -277,7 +279,6 @@ public class playerController : MonoBehaviour
         {
             if (Mathf.Sign(currentMouseAccel) == accelDir)
             {
-                Debug.Log("hit");
                 currentAcceleration = Mathf.Min(currentAcceleration + 3f * Time.deltaTime, finalAcceleration);
                 accelerationResetCounter = accelerationResetTimer;
             }
@@ -291,41 +292,21 @@ public class playerController : MonoBehaviour
         {
             if (accelerationResetCounter <= 0)
             {
-                Debug.Log("ZERO IT OUT!");
+                currentAcceleration = initialAcceleration;
             }
-            accelerationResetCounter -= 1 * Time.deltaTime;
-            
-        }
-        /*
-
-        Debug.Log(accelDir);
-
-        // movement speed calculations
-        if (Mathf.Sign(currentMouseAccel) != Mathf.Sign(accelDir))
-        {
-            Debug.Log("HITA");
-            // player mouse rotation direction has changed
-            currentAcceleration = initialAcceleration;
-            //accelDir = Mathf.Sign(currentMouseAccel);
-        }
-        else if (Mathf.Abs(currentMouseAccel) <= 0f)
-        {
-            Debug.Log("HITB");
-            currentAcceleration = initialAcceleration;
-        }
-        else
-        {
-            Debug.Log("HITC");
-            currentAcceleration = Mathf.Min(currentAcceleration + 5f * Time.deltaTime, finalAcceleration);
+            accelerationResetCounter -= 5 * Time.deltaTime;
         }
 
         // angle speed calculations
-        if (angle > 0)
+        if (Mathf.Abs(angle) > 0)
         {
-            currentAcceleration += (gravity * (Mathf.Sin(angle * Mathf.Deg2Rad) - Mathf.Cos(angle * Mathf.Deg2Rad) * 0.15f)) * Time.deltaTime;
+            currentAngularAcceleration = (rb.mass * gravity * (Mathf.Sin(angle * Mathf.Deg2Rad) - Mathf.Cos(angle * Mathf.Deg2Rad) * 1f)) * Time.deltaTime * Mathf.Sign(angle);
+            Debug.Log(Mathf.Sign(angle));
         }
-        */
-
+        else
+        {
+            currentAngularAcceleration = 0f;
+        }
     }
     
 
@@ -356,14 +337,15 @@ public class playerController : MonoBehaviour
         // no friction or slopeSpeed slow down when on a rail
         if (currentAcceleration > 0)
         {
-            currentHVelocity = currentHVelocity + currentAcceleration * Time.deltaTime;
+            currentHVelocity = currentHVelocity + (currentAcceleration + currentAngularAcceleration) * Time.deltaTime;
             currentHVelocity = Mathf.Clamp(currentHVelocity, initialVelocity, finalVelocity);
         }
         else
         {
-            if (currentAcceleration < 0)
+            if (Mathf.Abs(angle) > 5)
             {
-                currentHVelocity = currentHVelocity + (currentAcceleration * Time.deltaTime);
+                Debug.Log("HIT");
+                currentHVelocity = currentHVelocity + currentAngularAcceleration * Time.deltaTime;
                 currentHVelocity = Mathf.Clamp(currentHVelocity, -5f, finalVelocity);
             }
             else
@@ -643,7 +625,7 @@ public class playerController : MonoBehaviour
         
         // set rigidbody velocities
         rb.angularVelocity = Vector3.zero; // we are not using angular velocity so just reset it (makes sure player rigidbody doesnt tip over!!)
-        rb.velocity = camera.transform.forward * (currentHVelocity) - camera.transform.forward * (slopeSpeed); // set horizontal velocity to the current velocity
+        rb.velocity = camera.transform.forward * (currentHVelocity); // set horizontal velocity to the current velocity
         
         // additional context based movement calculations
         if (!onGround)
@@ -659,7 +641,8 @@ public class playerController : MonoBehaviour
             float newEulerX = Mathf.Min(eulers.x + 5f * Time.deltaTime, maxAirRotation);
 
             Quaternion newRotation = Quaternion.Euler(new Vector3(newEulerX,eulers.y,eulers.z));
-            transform.rotation = Quaternion.Lerp(transform.rotation, newRotation, 0.75f);
+            transform.rotation = newRotation;
+            //transform.rotation = Quaternion.Lerp(transform.rotation, newRotation, 0.75f);
         }
         else
         {
