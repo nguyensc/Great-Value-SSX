@@ -21,6 +21,7 @@ TagManager:
   - LMarker4
   - LMarker5
   - LMarker6
+  - PauseMenu
   layers:
   - Default
   - TransparentFX

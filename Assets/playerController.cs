@@ -26,12 +26,15 @@ public class playerController : MonoBehaviour
     float currentSpinVector = 1f;
     float rightMomentum = -1f;
     float leftMomentum = -1f;
+    int rightMomentumThreshold = 0;
+    int leftMomentumThreshold = 0;
 
     // movement vars
     public float currentMouseAccel = 0f;
+    float prevMouseAccel = 0f;
     float normalRotationSpeed = 100f;
     float slopeRotationSpeed = 85f;
-    float rotationSpeed = 100f;
+    float rotationSpeed = 200f;
     float accel = 0f;
     float accelDir = -1f;
     float verticalImpulse = 0f;
@@ -40,6 +43,8 @@ public class playerController : MonoBehaviour
     float angle = 0f;
     float maxAirRotation = 35f;
     float gravity = 5f;
+    float inputTimer = 0.005f;
+    float inputCounter = 0.005f;
 
     float initialVelocity = 0f;
     float finalVelocity = 100f;
@@ -94,9 +99,8 @@ public class playerController : MonoBehaviour
         camera = FindObjectOfType<Camera>();
 
         // set up gui stuff
-        /*
-        guiRightMarkers = new GameObject[6];
-        for (int i=0; i<6; ++i)
+        guiRightMarkers = new GameObject[7];
+        for (int i=0; i<=6; ++i)
         {
             guiRightMarkers[i] = GameObject.FindWithTag("Marker" + i.ToString());
             // shift their positions over a bit
@@ -106,7 +110,7 @@ public class playerController : MonoBehaviour
             guiRightMarkers[i].SetActive(false);
         }
 
-        */
+        
         guiLeftMarkers = new GameObject[7];
         for (int i=0; i<=6; ++i)
         {
@@ -280,6 +284,7 @@ public class playerController : MonoBehaviour
         {
             if (Mathf.Sign(currentMouseAccel) == accelDir)
             {
+                prevMouseAccel = currentMouseAccel;
                 currentAcceleration = Mathf.Min(currentAcceleration + 3f * Time.deltaTime, finalAcceleration);
                 accelerationResetCounter = accelerationResetTimer;
             }
@@ -391,7 +396,16 @@ public class playerController : MonoBehaviour
 
     void GetInputs()
     {
-        currentMouseAccel = Input.GetAxis("Mouse X");
+        if (inputCounter <= 0)
+        {  
+            currentMouseAccel = Input.GetAxis("Mouse X");
+            inputCounter = inputTimer;
+        }
+        else
+        {
+            inputCounter -= 1 * Time.deltaTime;
+        }
+        
 
         drank = false;
         if (Input.GetKey(KeyCode.Tab))
@@ -428,7 +442,7 @@ public class playerController : MonoBehaviour
         GroundCheck();
         CollectableCheck();
 
-        /*
+        
         // trick state machine
         switch (trickState)
         {
@@ -439,6 +453,8 @@ public class playerController : MonoBehaviour
                     // ensure both right/left momentum are reset
                     leftMomentum = -1f; 
                     rightMomentum = -1f;
+                    rightMomentumThreshold = (int)rightMomentum + 1;
+                    leftMomentumThreshold = (int)leftMomentum + 1;
                     trickState = trickStates.ON_RAMP;
                 }
                 break;
@@ -448,7 +464,7 @@ public class playerController : MonoBehaviour
                 if (!onRamp)
                 {
                     // back side spin condition
-                    if (rightMomentum > leftMomentum && leftMomentum >= 1f && rightMomentum >= 3f)
+                    if (leftMomentum > rightMomentum && rightMomentum >3f && leftMomentum >= 1f)
                     {
                         currentSpinRot = 360;
                         currentSpinVector = 1f;
@@ -458,7 +474,7 @@ public class playerController : MonoBehaviour
                     else if (leftMomentum > rightMomentum && rightMomentum >= 1f && leftMomentum >= 3f)
                     {
                         currentSpinRot = 360;
-                        currentSpinVector = 1f;
+                        currentSpinVector = -1f;
                         trickState = trickStates.SPIN;
                     }
                     // no trick conditions met
@@ -479,60 +495,74 @@ public class playerController : MonoBehaviour
                     {
                         marker.SetActive(false);
                     }
-
-                    
                 }
                 else
                 {
+                    float deltaMomentum = (5f * Mathf.Abs(prevMouseAccel)) * Time.deltaTime;
+                    float deltaDemomentum = 5f * Time.deltaTime;
+
                     // increase the right moment for acceleration in right dir
                     if (accelDir > 0 && currentAcceleration > 0)
                     {
-                        rightMomentum = Mathf.Min(rightMomentum + 0.25f, 5.5f);
+
+                        rightMomentum = Mathf.Min(rightMomentum + deltaMomentum, 6f);
                         // display a new marker when rightMomentum is a new whole number
-                        if ((rightMomentum % 1f) == 0)
+                        if (rightMomentum >= rightMomentumThreshold)
                         {
-                            guiRightMarkers[(int)rightMomentum].SetActive(true);
+                            rightMomentumThreshold = Mathf.Clamp(rightMomentumThreshold, 0, 6); // ensure correct data range
+                            // display marker
+                            guiRightMarkers[rightMomentumThreshold].SetActive(true);
+                            ++rightMomentumThreshold;
                         }
 
                         // hide the furtherest marker when leftMomentum subtracted is a new whole number
-                        if ((leftMomentum % 1f) == 0 && leftMomentum >= 0)
+                        if (leftMomentum < leftMomentumThreshold)
                         {
-                            guiLeftMarkers[(int)leftMomentum].SetActive(false);
-
+                            leftMomentumThreshold = Mathf.Clamp(leftMomentumThreshold, 0, 6); // ensure correct data range
+                            guiLeftMarkers[leftMomentumThreshold].SetActive(false);
+                            --leftMomentumThreshold;
                         }
-                        leftMomentum = Mathf.Max(leftMomentum - 0.25f, 0f); 
+                        leftMomentum = Mathf.Max(leftMomentum - deltaDemomentum, 0f); 
                     }
                     // increase the left moment for acceleration in left dir
                     else if (accelDir < 0 && currentAcceleration > 0)
                     {
-                        leftMomentum = Mathf.Min(leftMomentum + 0.25f, 5.5f);
+                        leftMomentum = Mathf.Min(leftMomentum + deltaMomentum, 6f);
                         // display a new marker when rightMomentum is a new whole number
-                        if ((leftMomentum % 1f) == 0)
+                        if (leftMomentum >= leftMomentumThreshold)
                         {
-                            guiLeftMarkers[(int)leftMomentum].SetActive(true);
+                            leftMomentumThreshold = Mathf.Clamp(leftMomentumThreshold, 0, 6); // ensure correct data range
+                            guiLeftMarkers[leftMomentumThreshold].SetActive(true);
+                            ++leftMomentumThreshold;
                         }
 
                         // hide the furtherest marker when leftMomentum subtracted is a new whole number
-                        if ((rightMomentum % 1f) == 0 && rightMomentum >= 0)
+                        if (rightMomentum < rightMomentumThreshold)
                         {
-                            guiRightMarkers[(int)rightMomentum].SetActive(false);
+                            rightMomentumThreshold = Mathf.Clamp(rightMomentumThreshold, 0, 6); // ensure correct data range
+                            guiRightMarkers[rightMomentumThreshold].SetActive(false);
+                            --rightMomentumThreshold;
                         }
-                        rightMomentum = Mathf.Max(rightMomentum - 0.25f, 0f); 
+                        rightMomentum = Mathf.Max(rightMomentum - deltaDemomentum, 0f); 
 
                     }
                     // moving without any horizontal mouse acceleration
                     else
                     {
-                        rightMomentum = Mathf.Max(rightMomentum - 0.25f, 0f);
-                        if ((rightMomentum % 1f) == 0)
+                        rightMomentum = Mathf.Max(rightMomentum - deltaDemomentum, 0f);
+                        if (rightMomentum < rightMomentumThreshold)
                         {
-                            guiRightMarkers[(int)rightMomentum].SetActive(false);
+                            rightMomentumThreshold = Mathf.Clamp(rightMomentumThreshold, 0, 6); // ensure correct data range
+                            guiRightMarkers[rightMomentumThreshold].SetActive(false);
+                            --rightMomentumThreshold;
                         }
 
-                        leftMomentum = Mathf.Max(leftMomentum - 0.25f, 0f);
-                        if ((leftMomentum % 1f) == 0)
+                        leftMomentum = Mathf.Max(leftMomentum - deltaDemomentum, 0f);
+                        if (leftMomentum < leftMomentumThreshold)
                         {
-                            guiLeftMarkers[(int)leftMomentum].SetActive(false);
+                            leftMomentumThreshold = Mathf.Clamp(leftMomentumThreshold, 0, 6); // ensure correct data range
+                            guiLeftMarkers[leftMomentumThreshold].SetActive(false);
+                            --leftMomentumThreshold;
                         }
                     }
                 }
@@ -543,17 +573,29 @@ public class playerController : MonoBehaviour
                 {
                     rightMomentum = -1f;
                     leftMomentum = -1f;
+                    rightMomentumThreshold = (int)rightMomentum + 1;
+                    leftMomentumThreshold = (int)leftMomentum + 1;
                     currentSpinRot = 0f;
+                    // if not a smooth landing, reduce velocity
+                    if (Mathf.Abs(Mathf.Abs(camera.transform.rotation.eulerAngles.y) - Mathf.Abs(transform.rotation.eulerAngles.y)) > 21f)
+                    {
+                        currentHVelocity /= 2;
+                        currentAcceleration /= 2;
+                    }
+                    //reset the camera rotation
+                    camera.transform.rotation = transform.rotation;
+
                     //transform.rotation = preSpinRotation;
                     trickState = trickStates.NONE;
                 }
                 else
                 {
                     //transform.rotation = Quaternion.Euler(new Vector3(transform.rotation.x, transform.rotation.y, transform.rotation.z) * (currentSpinRot * Mathf.Deg2Rad));
+                    currentSpinRot -= 50 * Time.deltaTime;
+
+                    Debug.Log(currentMouseAccel);
                     
-                    currentSpinRot -= 5;
-                    
-                    transform.RotateAround(transform.position, transform.up, currentSpinVector * currentSpinRot * (rotationSpeed / 100) * Time.deltaTime * currentMouseAccel);
+                    camera.transform.RotateAround(transform.position, transform.up, currentSpinVector * currentSpinRot * (rotationSpeed / 300) * Time.deltaTime * 2.5f);
 
                     rb.velocity += (Vector3.up * verticalImpulse + Physics.gravity * rb.mass) * Time.deltaTime * 2; 
 
@@ -563,7 +605,7 @@ public class playerController : MonoBehaviour
                 }
                 break; 
         }
-        */
+        
 
         rotationSpeed = normalRotationSpeed; // reset the speed of horizontal look rotation
 
