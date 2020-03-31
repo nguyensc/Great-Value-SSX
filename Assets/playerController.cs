@@ -75,6 +75,7 @@ public class playerController : MonoBehaviour
     bool onRamp = false;
     bool crouched = false;
     bool online = false;
+    public bool paused = false;
 
     public bool[] toSend =
     {
@@ -418,6 +419,11 @@ public class playerController : MonoBehaviour
 
     void Update()
     {
+        if (paused)
+        {
+            rb.velocity = Vector3.down * 0;
+            return;
+        }
         // initial world detections here
         GroundCheck();
         CollectableCheck();

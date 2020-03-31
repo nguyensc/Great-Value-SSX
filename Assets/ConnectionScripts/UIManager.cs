@@ -10,6 +10,8 @@ public class UIManager : MonoBehaviour
     public InputField usernameField;
     public InputField ipField;
 
+    playerController pCtrl;
+
     Canvas c;
 
     private void Awake()
@@ -18,6 +20,7 @@ public class UIManager : MonoBehaviour
         {
             instance = this;
             c = GetComponent<Canvas>();
+            pCtrl = FindObjectOfType<playerController>();
         }
         else if (instance != this)
         {
@@ -51,5 +54,7 @@ public class UIManager : MonoBehaviour
         {
             Cursor.lockState = CursorLockMode.Locked;
         }
+
+        pCtrl.paused = c.enabled;
     }
 }
