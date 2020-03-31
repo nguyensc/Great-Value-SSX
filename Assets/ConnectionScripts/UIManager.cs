@@ -38,6 +38,11 @@ public class UIManager : MonoBehaviour
 
     void Update()
     {
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            c.enabled = !c.enabled;
+        }
+
         if (c.enabled)
         {
             Cursor.lockState = CursorLockMode.None;
