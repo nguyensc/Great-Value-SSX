@@ -10,7 +10,8 @@ public class threadManager : MonoBehaviour
 
     private void Update()
     {
-        UpdateMain();
+        Debug.Log("hit from threadMgr");
+        //UpdateMain();
     }
 
     /// <summary>Sets an action to be executed on the main thread.</summary>
@@ -35,6 +36,8 @@ public class threadManager : MonoBehaviour
     {
         if (actionToExecuteOnMainThread)
         {
+            Debug.Log("action to exe on mainthread hit");
+
             executeCopiedOnMainThread.Clear();
             lock (executeOnMainThread)
             {

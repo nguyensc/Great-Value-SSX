@@ -38,7 +38,9 @@ public class client : MonoBehaviour
     {
         tcp = new TCP();
         udp = new UDP();
+        Debug.Log("HIT FROM CLIENT.CS");
     }
+    
     private void OnApplicationQuit()
     {
         //runs when app closes
@@ -47,6 +49,7 @@ public class client : MonoBehaviour
 
     public void ConnectToServer()
     {
+        Debug.Log("Hit at start of ConnectToServer");
         InitializeClientData();
         isConnected = true;
         Debug.Log("Trying to connect");
@@ -64,6 +67,8 @@ public class client : MonoBehaviour
 
         public void Connect()
         {
+            Debug.Log("Hit from TCP() class Connect()");
+
             socket = new TcpClient
             {
                 ReceiveBufferSize = dataBufferSize,
@@ -91,6 +96,9 @@ public class client : MonoBehaviour
         }
         public void SendData(packet pack)
         {
+            Debug.Log("Hit from sendata");
+
+
             try
             {
                 if (socket != null)

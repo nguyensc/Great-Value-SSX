@@ -13,17 +13,13 @@ public class guiSpeedCounterController : MonoBehaviour
     void Start()
     {
         text = GetComponent<Text>();
-        //player = FindObjectOfType<playerController>();
+        player = FindObjectOfType<playerController>();
     }
 
     // Update is called once per frame
     void Update()
     {
-        if(playerConnected)
-        {
-            text.text = "hVelocity: " + player.hVelocity.ToString() + "\nslopeSpeed: " + player.getSlopeSpeed().ToString() + "\nverticalImpulse: " + player.getVerticalImpulse().ToString() + "\naccel (vector): " + player.GetAccelerationVector().ToString();
-            return;
-        }
+        text.text = "hVelocity: " + player.getCurrentVelocity().ToString() + "\nslopeSpeed: " + player.getSlopeSpeed().ToString() + "\nverticalImpulse: " + player.getVerticalImpulse().ToString() + "\naccel (vector): " + player.GetAccelerationVector().ToString();
     }
 
     public static void getPlayer()
