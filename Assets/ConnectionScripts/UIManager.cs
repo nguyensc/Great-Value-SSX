@@ -10,11 +10,14 @@ public class UIManager : MonoBehaviour
     public InputField usernameField;
     public InputField ipField;
 
+    Canvas c;
+
     private void Awake()
     {
         if (instance == null)
         {
             instance = this;
+            c = GetComponent<Canvas>();
         }
         else if (instance != this)
         {
@@ -31,5 +34,17 @@ public class UIManager : MonoBehaviour
         ipField.interactable = false;
 
         client.instance.ConnectToServer();
+    }
+
+    void Update()
+    {
+        if (c.enabled)
+        {
+            Cursor.lockState = CursorLockMode.None;
+        }
+        else
+        {
+            Cursor.lockState = CursorLockMode.Locked;
+        }
     }
 }

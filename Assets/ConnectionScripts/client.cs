@@ -268,6 +268,7 @@ public class client : MonoBehaviour
         };
         Debug.Log("Initialized client data");
     }
+    
     private void Disconnect()
     {
         if (isConnected)
@@ -278,4 +279,5 @@ public class client : MonoBehaviour
             Debug.Log("Disconnected from server");
         }
     }
+    
 }
