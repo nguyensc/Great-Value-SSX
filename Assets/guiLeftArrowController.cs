@@ -23,6 +23,11 @@ public class guiLeftArrowController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (player.getDrank())
+        {
+            offsetx = 0;
+        }
+
         if (player.GetAccelerationVector() < 0)
         {
             offsetx = Mathf.Max(offsetx - deltaPos * Time.deltaTime, -100f);
@@ -40,7 +45,6 @@ public class guiLeftArrowController : MonoBehaviour
 
     public static void getPlayer()
     {
-        player = FindObjectOfType<playerController>();
         playerConnected = true;
         Debug.Log("Got player for left arrow");
     }

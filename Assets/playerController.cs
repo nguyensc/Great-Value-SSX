@@ -6,7 +6,7 @@ using UnityEngine.UI;
 public class playerController : MonoBehaviour
 {
     Rigidbody rb;
-    Camera camera;
+    public Camera camera;
 
     GameObject[] guiRightMarkers;
     GameObject[] guiLeftMarkers;
@@ -351,7 +351,6 @@ public class playerController : MonoBehaviour
         {
             if (Mathf.Abs(angle) > 5)
             {
-                Debug.Log("HIT");
                 currentHVelocity = currentHVelocity + currentAngularAcceleration * Time.deltaTime;
                 currentHVelocity = Mathf.Clamp(currentHVelocity, -5f, finalVelocity);
             }
@@ -505,7 +504,7 @@ public class playerController : MonoBehaviour
                 }
                 else
                 {
-                    float deltaMomentum = (5f * Mathf.Abs(prevMouseAccel)) * Time.deltaTime;
+                    float deltaMomentum = (1f * Mathf.Abs(prevMouseAccel)) * Time.deltaTime;
                     float deltaDemomentum = 5f * Time.deltaTime;
 
                     // increase the right moment for acceleration in right dir

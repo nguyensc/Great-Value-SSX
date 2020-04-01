@@ -63,11 +63,20 @@ public class drankController : MonoBehaviour
                     transform.localPosition = originalLocalPosition;
                     transform.localRotation = originalLocalRotation;
                     player.canDrank = true;
+                    drankCounter = 0;
                 }
 
                 if (player.getDrank())
                 {
                     drankCounter = drankTimer;
+                }
+                else if (drankCounter == 0)
+                {
+                    if (player.camera.transform.localRotation.y != player.transform.localRotation.y)
+                    {
+                        transform.localRotation = player.camera.transform.localRotation;
+                    }
+                    
                 }
             }
             else
