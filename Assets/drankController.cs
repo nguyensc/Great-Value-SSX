@@ -8,12 +8,13 @@ public class drankController : MonoBehaviour
     float drankTimer = 1f;
     float drankCounter = 0f;
     Vector3 originalLocalPosition;
-    GameObject game;
+    Quaternion originalLocalRotation;
     // Start is called before the first frame update
     void Start()
     {
         player = FindObjectOfType<playerController>();
         originalLocalPosition = transform.localPosition;
+        originalLocalRotation = transform.localRotation;
     }
 
     void RotateBottle(float dir)
@@ -41,7 +42,6 @@ public class drankController : MonoBehaviour
     {
         if (!player.paused)
         {
-            Debug.Log(transform.localPosition.y);
             if (drankCounter <= 0f)
             {
 
@@ -61,6 +61,8 @@ public class drankController : MonoBehaviour
                 {
                     // reset position so stays out of sight
                     transform.localPosition = originalLocalPosition;
+                    transform.localRotation = originalLocalRotation;
+                    player.canDrank = true;
                 }
 
                 if (player.getDrank())

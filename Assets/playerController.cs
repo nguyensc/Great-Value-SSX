@@ -69,6 +69,7 @@ public class playerController : MonoBehaviour
     Vector3 spawnNormal;
     Quaternion spawnRot;
     bool drank = false;
+    public bool canDrank = true;
     float drankHeldDown = 0f;
     float spawnHVelocity = 0f;
     float spawnAccelDir = 1f;
@@ -383,7 +384,7 @@ public class playerController : MonoBehaviour
         spawnNormal = groundNormal;
     }
 
-    void Respawn()
+    public void Respawn()
     {
         transform.position = spawnCoords;
         transform.rotation = spawnRot;
@@ -408,22 +409,30 @@ public class playerController : MonoBehaviour
         
 
         drank = false;
-        if (Input.GetKey(KeyCode.Tab))
+        if (Input.GetKey(KeyCode.Tab) && canDrank)
         {
-            drankHeldDown++;
-
-            drank = true;
+            drankHeldDown += 1f * Time.deltaTime;
+            if (drankHeldDown < 1)
+            {
+                drank = true; 
+            }
+            else
+            {
+                canDrank = false;
+                drank = false;
+                drankHeldDown = 0f;
+                SetSpawnCoords();
+            }
         }
-        else if (drankHeldDown > 40)
+        else if (drankHeldDown < 0.5 && drankHeldDown > 0f)
         {
-            Debug.Log("hey");
-            //drankHeldDown = 0f;
-        }
-        else if (drankHeldDown > 5)
-        {
+            canDrank = false;
             drankHeldDown = 0f;
-            drank = true;
-            //Respawn();
+            Respawn();
+        }
+        else if (drankHeldDown > 0)
+        {
+            canDrank = false;
         }
         
     }
@@ -462,17 +471,17 @@ public class playerController : MonoBehaviour
                 if (!onRamp)
                 {
                     // back side spin condition
-                    if (leftMomentum > rightMomentum && rightMomentum >3f && leftMomentum >= 1f)
-                    {
-                        currentSpinRot = 360;
-                        currentSpinVector = 1f;
-                        trickState = trickStates.SPIN;
-                    }
-                    // front side spin condition
-                    else if (leftMomentum > rightMomentum && rightMomentum >= 1f && leftMomentum >= 3f)
+                    if (leftMomentum > rightMomentum && rightMomentum > 2f && accelDir < 0)
                     {
                         currentSpinRot = 360;
                         currentSpinVector = -1f;
+                        trickState = trickStates.SPIN;
+                    }
+                    // front side spin condition
+                    else if (leftMomentum < rightMomentum && leftMomentum > 2f && accelDir > 0)
+                    {
+                        currentSpinRot = 360;
+                        currentSpinVector = 1f;
                         trickState = trickStates.SPIN;
                     }
                     // no trick conditions met
