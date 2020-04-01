@@ -412,20 +412,18 @@ public class playerController : MonoBehaviour
         {
             drankHeldDown++;
 
-            if (drankHeldDown > 20 && drankHeldDown < 40)
-            {
-                
-                drank = true;
-            }
+            drank = true;
         }
-        else if (drankHeldDown > 20)
+        else if (drankHeldDown > 40)
         {
-            drankHeldDown = 0f;
+            Debug.Log("hey");
+            //drankHeldDown = 0f;
         }
         else if (drankHeldDown > 5)
         {
             drankHeldDown = 0f;
-            Respawn();
+            drank = true;
+            //Respawn();
         }
         
     }
