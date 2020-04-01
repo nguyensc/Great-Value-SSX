@@ -10,8 +10,8 @@ public class threadManager : MonoBehaviour
 
     private void Update()
     {
-        Debug.Log("hit from threadMgr");
-        //UpdateMain();
+        //Debug.Log("hit from threadMgr");
+        UpdateMain();
     }
 
     /// <summary>Sets an action to be executed on the main thread.</summary>
