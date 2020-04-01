@@ -7,10 +7,13 @@ public class drankController : MonoBehaviour
     playerController player;
     float drankTimer = 1f;
     float drankCounter = 0f;
+    Vector3 originalLocalPosition;
+    GameObject game;
     // Start is called before the first frame update
     void Start()
     {
         player = FindObjectOfType<playerController>();
+        originalLocalPosition = transform.localPosition;
     }
 
     void RotateBottle(float dir)
@@ -21,12 +24,12 @@ public class drankController : MonoBehaviour
         if (dir > 0)
         {
             newEuler = Mathf.Min(eulers.x + 50f * Time.deltaTime, 270);
-            transform.localPosition = new Vector3(transform.localPosition.x, transform.localPosition.y - 1f * Time.deltaTime, transform.localPosition.z);
+            transform.localPosition = new Vector3(transform.localPosition.x, transform.localPosition.y - 0.25f * Time.deltaTime, transform.localPosition.z - 0.5f * Time.deltaTime);
         }
         else
         {
             newEuler = eulers.x - 50f * Time.deltaTime;
-            transform.localPosition = new Vector3(transform.localPosition.x, transform.localPosition.y + 1f * Time.deltaTime, transform.localPosition.z);
+            transform.localPosition = new Vector3(transform.localPosition.x, transform.localPosition.y + 0.25f * Time.deltaTime, transform.localPosition.z + 0.5f * Time.deltaTime);
         }
         
         Quaternion newRotation = Quaternion.Euler(new Vector3(newEuler, eulers.y, eulers.z));
@@ -54,6 +57,11 @@ public class drankController : MonoBehaviour
                         RotateBottle(1);
                     }
                 }      
+                else
+                {
+                    // reset position so stays out of sight
+                    transform.localPosition = originalLocalPosition;
+                }
 
                 if (player.getDrank())
                 {
