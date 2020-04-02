@@ -263,7 +263,8 @@ public class playerController : MonoBehaviour
         {
             if (onRamp)
             {
-                verticalImpulse = (Mathf.Sin(Mathf.Abs(angle) * Mathf.Deg2Rad) * currentHVelocity);
+                //verticalImpulse += (Mathf.Sin(Mathf.Abs(angle) * Mathf.Deg2Rad) * Mathf.Max(currentHVelocity, 1f)) * Time.deltaTime;
+                verticalImpulse = (Mathf.Sin(Mathf.Abs(angle) * Mathf.Deg2Rad) * Mathf.Max(currentHVelocity, 1f));
             }
             else
             {
@@ -470,14 +471,14 @@ public class playerController : MonoBehaviour
                 if (!onRamp)
                 {
                     // back side spin condition
-                    if (leftMomentum > rightMomentum && rightMomentum > 2f && accelDir < 0)
+                    if (leftMomentum > rightMomentum && rightMomentum >= 2f && accelDir < 0)
                     {
                         currentSpinRot = 360;
                         currentSpinVector = -1f;
                         trickState = trickStates.SPIN;
                     }
                     // front side spin condition
-                    else if (leftMomentum < rightMomentum && leftMomentum > 2f && accelDir > 0)
+                    else if (leftMomentum < rightMomentum && leftMomentum >= 2f && accelDir > 0)
                     {
                         currentSpinRot = 360;
                         currentSpinVector = 1f;
@@ -504,7 +505,7 @@ public class playerController : MonoBehaviour
                 }
                 else
                 {
-                    float deltaMomentum = Mathf.Max(Mathf.Abs(currentMouseAccel) * 2f, 6f) * Time.deltaTime;
+                    float deltaMomentum = Mathf.Max(Mathf.Abs(currentMouseAccel) * 10f, 5f) * Time.deltaTime;
                     float deltaDemomentum = 5f * Time.deltaTime;
 
                     // increase the right moment for acceleration in right dir
@@ -692,11 +693,10 @@ public class playerController : MonoBehaviour
             // slowly rotate forwards while in the air
             Vector3 eulers = this.transform.rotation.eulerAngles;
 
-            float newEulerX = Mathf.Min(eulers.x + 5f * Time.deltaTime, maxAirRotation);
+            float newEulerX = Mathf.Min(eulers.x + 3f * Time.deltaTime, maxAirRotation);
 
             Quaternion newRotation = Quaternion.Euler(new Vector3(newEulerX,eulers.y,eulers.z));
-            transform.rotation = newRotation;
-            //transform.rotation = Quaternion.Lerp(transform.rotation, newRotation, 0.75f);
+            transform.rotation = Quaternion.Lerp(transform.rotation, newRotation, 0.25f);
         }
         else
         {
