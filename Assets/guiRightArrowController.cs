@@ -21,11 +21,6 @@ public class guiRightArrowController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (player.getDrank())
-        {
-            offsetx = 0;
-        }
-
         if (player.GetAccelerationVector() > 0)
         {
             offsetx = Mathf.Min(offsetx + deltaPos * Time.deltaTime, 100f);

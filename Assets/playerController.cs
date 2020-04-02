@@ -504,7 +504,7 @@ public class playerController : MonoBehaviour
                 }
                 else
                 {
-                    float deltaMomentum = (1f * Mathf.Abs(prevMouseAccel)) * Time.deltaTime;
+                    float deltaMomentum = Mathf.Max(Mathf.Abs(currentMouseAccel) * 2f, 6f) * Time.deltaTime;
                     float deltaDemomentum = 5f * Time.deltaTime;
 
                     // increase the right moment for acceleration in right dir
