@@ -79,6 +79,7 @@ public class playerController : MonoBehaviour
     public bool onRail = false;
     bool onGround = false;
     bool onRamp = false;
+    bool onPipe = false;
     bool crouched = false;
     bool online = false;
     public bool paused = false;
@@ -227,19 +228,22 @@ public class playerController : MonoBehaviour
         
         Debug.DrawRay(r.origin, r.direction, Color.magenta, 1f); 
         
-        if (Physics.Raycast(camera.transform.position, -camera.transform.up, out RaycastHit hit, 1.25f)){
+        if (Physics.Raycast(camera.transform.position + camera.transform.up * 0.1f, -camera.transform.up, out RaycastHit hit, 1f)){
             onGround = true;
+            onPipe = false;
             groundNormal = hit.normal;
             
-            // check for rail(grinding)
-            if (hit.transform.tag == "Rail")
+            switch(hit.transform.tag)
             {
-                onRail = true;
-            }
-            else if (hit.transform.tag == "Ramp")
-            {
-                Debug.Log("HIT");
-                onRamp = true;
+                case "Rail":
+                    onRail = true;
+                    break;
+                case "Ramp":
+                    onRamp = true;
+                    break;
+                case "Pipe":
+                    onPipe = true;
+                    break;
             }
 
         }
@@ -265,7 +269,7 @@ public class playerController : MonoBehaviour
     {
         if (onGround)
         {
-            if (onRamp)
+            if (onRamp || onPipe || onRail)
             {
                 //verticalImpulse += (Mathf.Sin(Mathf.Abs(angle) * Mathf.Deg2Rad) * Mathf.Max(currentHVelocity, 1f)) * Time.deltaTime;
                 verticalImpulse = (Mathf.Sin(Mathf.Abs(angle) * Mathf.Deg2Rad) * Mathf.Max(currentHVelocity, 1f));
@@ -641,8 +645,14 @@ public class playerController : MonoBehaviour
         // get inputs
         GetInputs();
         
+        Vector3 yaxis = Vector3.up;
+        if (onPipe)
+        {
+            yaxis = transform.up;
+        }
+
         // rotate player horizontally based on input
-        transform.RotateAround(transform.position, Vector3.up, currentMouseAccel * rotationSpeed * Time.deltaTime); 
+        transform.RotateAround(transform.position, yaxis, currentMouseAccel * rotationSpeed * Time.deltaTime); 
 
         // handle crouching
         if (onGround)
@@ -694,9 +704,26 @@ public class playerController : MonoBehaviour
 
             groundNormal = Vector3.up; // reset the angle to align with, so the player is not stuck as the angle from the previous slope
             
-            // slowly rotate forwards while in the air
             Vector3 eulers = this.transform.rotation.eulerAngles;
 
+            if (onPipe)
+            {
+                rb.velocity = new Vector3(0, rb.velocity.y + 3f, 0) + transform.up;
+                currentAcceleration = 0;
+                /*
+                if (verticalImpulse < -1)
+                {
+                    transform.RotateAround(transform.position, transform.up, accelDir * 2f * rotationSpeed * Time.deltaTime);
+                    rb.velocity -= transform.up;
+                }
+                */
+                
+                 
+                //transform.rotation = Quaternion.Euler(eulers + Vector3.down);
+                return;
+            }
+            
+            // slowly rotate forwards while in the air            
             float newEulerX = Mathf.Min(eulers.x + 3f * Time.deltaTime, maxAirRotation);
 
             Quaternion newRotation = Quaternion.Euler(new Vector3(newEulerX,eulers.y,eulers.z));
@@ -704,7 +731,8 @@ public class playerController : MonoBehaviour
         }
         else
         {
-            transform.rotation = Quaternion.Lerp(transform.rotation, Quaternion.LookRotation(Vector3.Cross(transform.right, groundNormal)), 0.75f);
+            transform.rotation = Quaternion.LookRotation(Vector3.Cross(camera.transform.right, groundNormal));
+            //transform.rotation = Quaternion.Lerp(transform.rotation, Quaternion.LookRotation(Vector3.Cross(camera.transform.right, groundNormal)), 1f);
         }
     }
 
