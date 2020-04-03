@@ -11,7 +11,9 @@ public class client : MonoBehaviour
     public static client instance;
     public static int dataBufferSize = 4096;
 
-    public string ip = "67.167.183.119";
+    public InputField ipField;
+
+    public string ip;
     //public string ip = UIManager.instance.ipField.text; //pull the ip from the field
     public int port = 46400;
     public int myId = 0;
@@ -27,6 +29,7 @@ public class client : MonoBehaviour
         if (instance == null)
         {
             instance = this;
+            ip = ipField.text;
         }
         else if (instance != this)
         {
@@ -34,11 +37,11 @@ public class client : MonoBehaviour
             Destroy(this);
         }
     }
-    private void Start()
+    public void onStart()
     {
+        ip = ipField.text;
         tcp = new TCP();
         udp = new UDP();
-        Debug.Log("HIT FROM CLIENT.CS");
     }
     
     private void OnApplicationQuit()
@@ -49,6 +52,8 @@ public class client : MonoBehaviour
 
     public void ConnectToServer()
     {
+        
+        ip = ipField.text;
         Debug.Log("Hit at start of ConnectToServer");
         InitializeClientData();
         isConnected = true;

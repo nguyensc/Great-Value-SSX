@@ -8,7 +8,7 @@ public class UIManager : MonoBehaviour
     public static UIManager instance;
     public GameObject startMenu;
     public InputField usernameField;
-    public InputField ipField;
+    public bool isConnected = false;
 
     playerController pCtrl;
 
@@ -34,8 +34,10 @@ public class UIManager : MonoBehaviour
         Debug.Log("The button was pressed");
         startMenu.SetActive(false);
         usernameField.interactable = false;
-        ipField.interactable = false;
+        client.instance.ipField.interactable = false;
+        isConnected = true;
 
+        client.instance.onStart();
         client.instance.ConnectToServer();
     }
 

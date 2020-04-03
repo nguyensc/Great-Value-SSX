@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 1526980366}
-  m_IndirectSpecularColor: {r: 0.600001, g: 0.07487885, b: 0.45330277, a: 1}
+  m_IndirectSpecularColor: {r: 0.5996393, g: 0.07485824, b: 0.45314527, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -3479,7 +3479,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dba5a508057e6f345b3ce829c4a475f2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ip: 127.0.0.1
+  ipField: {fileID: 1441111136}
   port: 46400
   myId: 1
 --- !u!4 &251699190
@@ -4196,7 +4196,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   startMenu: {fileID: 1765245995}
   usernameField: {fileID: 967377299}
-  ipField: {fileID: 1441111136}
+  isConnected: 0
 --- !u!114 &313470675
 MonoBehaviour:
   m_ObjectHideFlags: 0

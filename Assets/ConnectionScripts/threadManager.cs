@@ -36,7 +36,6 @@ public class threadManager : MonoBehaviour
     {
         if (actionToExecuteOnMainThread)
         {
-            Debug.Log("action to exe on mainthread hit");
 
             executeCopiedOnMainThread.Clear();
             lock (executeOnMainThread)

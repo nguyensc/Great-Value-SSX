@@ -105,6 +105,10 @@ public class playerController : MonoBehaviour
         {
             guiRightMarkers[i] = GameObject.FindWithTag("Marker" + i.ToString());
             // shift their positions over a bit
+            if (guiRightMarkers[i] == null)
+            {
+                Debug.Log("GUI object is null");
+            }
             RectTransform rect = guiRightMarkers[i].GetComponent<RectTransform>();
             rect.localPosition = new Vector3(rect.localPosition.x + 20 + 20 * i, rect.localPosition.y, rect.localPosition.z);
             // hide each marker
@@ -706,7 +710,7 @@ public class playerController : MonoBehaviour
 
     void FixedUpdate()
     {
-        if (online)
+        if (UIManager.instance.isConnected)
         {
             clientSend.PlayerMovement(toSend);
         }
