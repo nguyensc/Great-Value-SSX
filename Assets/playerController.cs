@@ -738,7 +738,7 @@ public class playerController : MonoBehaviour
 
     void FixedUpdate()
     {
-        if (UIManager.instance.isConnected)
+        if (gameManager.instance.gotConnection)
         {
             clientSend.PlayerMovement(toSend);
         }

@@ -56,6 +56,10 @@ public class clientSend : MonoBehaviour
             //The position values and rotations might need to get pulled from a rigidbody
             //if that's the case, we need to create a rigidbody on spawn and assign it to the 
             //player manager.
+            if(client.instance.myId == 0)
+            {
+                Debug.Log("Client has an ID of 0");
+            }
             pack.Write(gameManager.players[client.instance.myId].transform.rotation);
             pack.Write(gameManager.players[client.instance.myId].transform.position);
 

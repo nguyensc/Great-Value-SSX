@@ -52,14 +52,12 @@ public class client : MonoBehaviour
 
     public void ConnectToServer()
     {
-        
         ip = ipField.text;
         Debug.Log("Hit at start of ConnectToServer");
         InitializeClientData();
         isConnected = true;
         Debug.Log("Trying to connect");
         tcp.Connect();
-
     }
 
     public class TCP
@@ -101,9 +99,6 @@ public class client : MonoBehaviour
         }
         public void SendData(packet pack)
         {
-            Debug.Log("Hit from sendata");
-
-
             try
             {
                 if (socket != null)

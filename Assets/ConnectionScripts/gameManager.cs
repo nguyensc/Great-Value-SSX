@@ -31,6 +31,7 @@ public class gameManager : MonoBehaviour
         {
             Destroy(currentLocalPlayer);
             playerObj = Instantiate(localPlayerPrefab, position, rotation);
+            Debug.Log("Instantiated a player");
         }
         else
         {
