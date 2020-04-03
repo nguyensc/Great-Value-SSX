@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 1526980366}
-  m_IndirectSpecularColor: {r: 0.5996393, g: 0.07485824, b: 0.45314527, a: 1}
+  m_IndirectSpecularColor: {r: 0.600001, g: 0.07487885, b: 0.45330277, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -370,7 +370,6 @@ GameObject:
   - component: {fileID: 15831171}
   - component: {fileID: 15831174}
   - component: {fileID: 15831173}
-  - component: {fileID: 15831172}
   m_Layer: 0
   m_Name: guiRightMomentumMarker5
   m_TagString: Marker5
@@ -397,18 +396,6 @@ RectTransform:
   m_AnchoredPosition: {x: 10, y: 0}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &15831172
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 15831170}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 02765c0487e09854caf2020d3190cacc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &15831173
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -924,7 +911,6 @@ GameObject:
   - component: {fileID: 58683337}
   - component: {fileID: 58683340}
   - component: {fileID: 58683339}
-  - component: {fileID: 58683338}
   m_Layer: 0
   m_Name: guiLeftMomentumMarker1
   m_TagString: LMarker1
@@ -951,18 +937,6 @@ RectTransform:
   m_AnchoredPosition: {x: -10, y: 0}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &58683338
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 58683336}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 02765c0487e09854caf2020d3190cacc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &58683339
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2839,7 +2813,6 @@ GameObject:
   - component: {fileID: 220915809}
   - component: {fileID: 220915812}
   - component: {fileID: 220915811}
-  - component: {fileID: 220915810}
   m_Layer: 0
   m_Name: guiLeftMomentumMarker0
   m_TagString: LMarker0
@@ -2866,18 +2839,6 @@ RectTransform:
   m_AnchoredPosition: {x: -10, y: 0}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &220915810
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 220915808}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 02765c0487e09854caf2020d3190cacc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &220915811
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2982,7 +2943,6 @@ GameObject:
   - component: {fileID: 221870321}
   - component: {fileID: 221870324}
   - component: {fileID: 221870323}
-  - component: {fileID: 221870322}
   m_Layer: 0
   m_Name: guiRightMomentumMarker1
   m_TagString: Marker1
@@ -3009,18 +2969,6 @@ RectTransform:
   m_AnchoredPosition: {x: 10, y: 0}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &221870322
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 221870320}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 02765c0487e09854caf2020d3190cacc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &221870323
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3480,6 +3428,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ipField: {fileID: 1441111136}
+  ip: 
   port: 46400
   myId: 1
 --- !u!4 &251699190
@@ -7837,7 +7786,6 @@ GameObject:
   - component: {fileID: 641374376}
   - component: {fileID: 641374379}
   - component: {fileID: 641374378}
-  - component: {fileID: 641374377}
   m_Layer: 0
   m_Name: guiRightMomentumMarker3
   m_TagString: Marker3
@@ -7864,18 +7812,6 @@ RectTransform:
   m_AnchoredPosition: {x: 10, y: 0}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &641374377
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 641374375}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 02765c0487e09854caf2020d3190cacc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &641374378
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10157,7 +10093,6 @@ GameObject:
   - component: {fileID: 840015541}
   - component: {fileID: 840015544}
   - component: {fileID: 840015543}
-  - component: {fileID: 840015542}
   m_Layer: 0
   m_Name: guiRightMomentumMarker6
   m_TagString: Marker6
@@ -10184,18 +10119,6 @@ RectTransform:
   m_AnchoredPosition: {x: 10, y: 0}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &840015542
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 840015540}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 02765c0487e09854caf2020d3190cacc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &840015543
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -14829,7 +14752,6 @@ GameObject:
   - component: {fileID: 1229541317}
   - component: {fileID: 1229541320}
   - component: {fileID: 1229541319}
-  - component: {fileID: 1229541318}
   m_Layer: 0
   m_Name: guiLeftMomentumMarker3
   m_TagString: LMarker3
@@ -14856,18 +14778,6 @@ RectTransform:
   m_AnchoredPosition: {x: -10, y: 0}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &1229541318
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1229541316}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 02765c0487e09854caf2020d3190cacc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &1229541319
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -15394,7 +15304,6 @@ GameObject:
   - component: {fileID: 1284060944}
   - component: {fileID: 1284060947}
   - component: {fileID: 1284060946}
-  - component: {fileID: 1284060945}
   m_Layer: 0
   m_Name: guiLeftMomentumMarker6
   m_TagString: LMarker6
@@ -15421,18 +15330,6 @@ RectTransform:
   m_AnchoredPosition: {x: -10, y: 0}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &1284060945
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1284060943}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 02765c0487e09854caf2020d3190cacc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &1284060946
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -15500,7 +15397,6 @@ GameObject:
   - component: {fileID: 1294018894}
   - component: {fileID: 1294018897}
   - component: {fileID: 1294018896}
-  - component: {fileID: 1294018895}
   m_Layer: 0
   m_Name: guiRightMomentumMarker0
   m_TagString: Marker0
@@ -15527,18 +15423,6 @@ RectTransform:
   m_AnchoredPosition: {x: 10, y: 0}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &1294018895
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1294018893}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 02765c0487e09854caf2020d3190cacc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &1294018896
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -15780,7 +15664,6 @@ GameObject:
   - component: {fileID: 1308698045}
   - component: {fileID: 1308698048}
   - component: {fileID: 1308698047}
-  - component: {fileID: 1308698046}
   m_Layer: 0
   m_Name: guiRightMomentumMarker2
   m_TagString: Marker2
@@ -15807,18 +15690,6 @@ RectTransform:
   m_AnchoredPosition: {x: 10, y: 0}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &1308698046
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1308698044}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 02765c0487e09854caf2020d3190cacc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &1308698047
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -19827,7 +19698,6 @@ GameObject:
   - component: {fileID: 1664532055}
   - component: {fileID: 1664532058}
   - component: {fileID: 1664532057}
-  - component: {fileID: 1664532056}
   m_Layer: 0
   m_Name: guiRightMomentumMarker4
   m_TagString: Marker4
@@ -19854,18 +19724,6 @@ RectTransform:
   m_AnchoredPosition: {x: 10, y: 0}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &1664532056
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1664532054}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 02765c0487e09854caf2020d3190cacc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &1664532057
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -22068,7 +21926,6 @@ GameObject:
   - component: {fileID: 1866726380}
   - component: {fileID: 1866726383}
   - component: {fileID: 1866726382}
-  - component: {fileID: 1866726381}
   m_Layer: 0
   m_Name: guiLeftMomentumMarker2
   m_TagString: LMarker2
@@ -22095,18 +21952,6 @@ RectTransform:
   m_AnchoredPosition: {x: -10, y: 0}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &1866726381
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1866726379}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 02765c0487e09854caf2020d3190cacc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &1866726382
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -22154,7 +21999,6 @@ GameObject:
   - component: {fileID: 1868203241}
   - component: {fileID: 1868203244}
   - component: {fileID: 1868203243}
-  - component: {fileID: 1868203242}
   m_Layer: 0
   m_Name: guiLeftMomentumMarker4
   m_TagString: LMarker4
@@ -22181,18 +22025,6 @@ RectTransform:
   m_AnchoredPosition: {x: -10, y: 0}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &1868203242
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1868203240}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 02765c0487e09854caf2020d3190cacc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &1868203243
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -23887,7 +23719,6 @@ GameObject:
   - component: {fileID: 2009070949}
   - component: {fileID: 2009070952}
   - component: {fileID: 2009070951}
-  - component: {fileID: 2009070950}
   m_Layer: 0
   m_Name: guiLeftMomentumMarker5
   m_TagString: LMarker5
@@ -23914,18 +23745,6 @@ RectTransform:
   m_AnchoredPosition: {x: -10, y: 0}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &2009070950
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2009070948}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 02765c0487e09854caf2020d3190cacc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &2009070951
 MonoBehaviour:
   m_ObjectHideFlags: 0
