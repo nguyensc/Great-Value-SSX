@@ -282,9 +282,10 @@ public class playerController : MonoBehaviour
         {
             if (crouched)
             {
-                Debug.Log("hit");
+                Debug.Log("HIT");
                 verticalImpulse -= 10f;
-                currentHVelocity -= 1f;
+                currentHVelocity -= 5f;
+                currentSpinRot = 1f;
             }
 
             // make the amount of upwards speed decrease, eventually becoming negative and add onto gravity's effect
@@ -410,6 +411,8 @@ public class playerController : MonoBehaviour
 
     void GetInputs()
     {
+        crouched = Input.GetMouseButtonDown(0);
+
         if (inputCounter <= 0)
         {  
             currentMouseAccel = Input.GetAxis("Mouse X");
@@ -422,7 +425,7 @@ public class playerController : MonoBehaviour
         
 
         drank = false;
-        if (Input.GetKey(KeyCode.Tab) && canDrank)
+        if (Input.GetKey(KeyCode.Tab) && canDrank && trickState != trickStates.SPIN)
         {
             drankHeldDown += 1f * Time.deltaTime;
             if (drankHeldDown < 1)
@@ -461,6 +464,9 @@ public class playerController : MonoBehaviour
         // initial world detections here
         GroundCheck();
         CollectableCheck();
+
+        // get inputs
+        GetInputs();
 
         
         // trick state machine
@@ -577,6 +583,7 @@ public class playerController : MonoBehaviour
                 break;
 
             case (trickStates.SPIN):
+                // rotation work
                 if (currentSpinRot <= 0 || onGround)
                 {
                     rightMomentum = -1f;
@@ -598,15 +605,8 @@ public class playerController : MonoBehaviour
                 }
                 else
                 {
-                    crouched = Input.GetMouseButtonDown(0);
-
                     //transform.rotation = Quaternion.Euler(new Vector3(transform.rotation.x, transform.rotation.y, transform.rotation.z) * (currentSpinRot * Mathf.Deg2Rad));
                     currentSpinRot -= 50 * Time.deltaTime;
-
-                    if (crouched)
-                    {
-                        currentSpinRot = 1;
-                    }
                     
                     camera.transform.RotateAround(transform.position, transform.up, currentSpinVector * currentSpinRot * (rotationSpeed / 300) * Time.deltaTime * 2.5f);
 
@@ -640,9 +640,6 @@ public class playerController : MonoBehaviour
             slopeSpeed = Mathf.Lerp(slopeSpeed, Mathf.Sign(angle) * Mathf.Abs(Mathf.Sin(angle) / 2f), 0.01f); // gradually increase the speed caused by a sloped surface
         }
         
-        // get inputs
-        GetInputs();
-        
         Vector3 yaxis = Vector3.up;
         if (onPipe)
         {
@@ -653,6 +650,7 @@ public class playerController : MonoBehaviour
         transform.RotateAround(transform.position, yaxis, currentMouseAccel * rotationSpeed * Time.deltaTime); 
 
         // handle crouching
+        /*
         if (onGround)
         {
             if (!crouched)
@@ -672,11 +670,7 @@ public class playerController : MonoBehaviour
                 }
             }
         }
-        else
-        {
-            crouched = false;
-        }
-
+        */
 
         // calculate any angle caused by a slope
         angle = Vector3.SignedAngle(Vector3.up, groundNormal, transform.right);
@@ -697,7 +691,6 @@ public class playerController : MonoBehaviour
         // additional context based movement calculations
         if (!onGround)
         {
-
             rb.velocity += Vector3.up * verticalImpulse + Physics.gravity * rb.mass; // calculate the vertical velocity at this moment in the air
 
             groundNormal = Vector3.up; // reset the angle to align with, so the player is not stuck as the angle from the previous slope

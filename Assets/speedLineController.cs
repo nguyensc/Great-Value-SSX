@@ -10,7 +10,7 @@ public class speedLineController : MonoBehaviour
     {
         player = FindObjectOfType<playerController>();
         ps = GetComponent<ParticleSystem>();
-        ps.Pause();
+        ps.Stop();
     }
 
     // Update is called once per frame
@@ -19,14 +19,15 @@ public class speedLineController : MonoBehaviour
 
         if (player.getCurrentVelocity() > 30)
         {
-            if (ps.isPaused)
+            if (ps.isStopped)
             {
                 ps.Play();
             }
         }
         else if (ps.isPlaying)
         {
-            ps.Pause();
+            ps.Clear();
+            ps.Stop();
         }
         
     }
