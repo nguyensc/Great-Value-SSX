@@ -22,6 +22,7 @@ TagManager:
   - LMarker5
   - LMarker6
   - PauseMenu
+  - Pipe
   layers:
   - Default
   - TransparentFX

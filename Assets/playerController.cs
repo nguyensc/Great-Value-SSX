@@ -8,8 +8,9 @@ public class playerController : MonoBehaviour
     Rigidbody rb;
     public Camera camera;
 
-    GameObject[] guiRightMarkers;
-    GameObject[] guiLeftMarkers;
+    leftMomentumController leftMomentumCtrl;
+
+    rightMomentumController rightMomentumCtrl;
 
     Vector3 groundNormal;
 
@@ -25,9 +26,9 @@ public class playerController : MonoBehaviour
     float currentSpinRot = 0f;
     float currentSpinVector = 1f;
     float rightMomentum = -1f;
-    float leftMomentum = -1f;
+    public float leftMomentum = -1f;
     int rightMomentumThreshold = 0;
-    int leftMomentumThreshold = 0;
+    public int leftMomentumThreshold = 0;
 
     // movement vars
     public float currentMouseAccel = 0f;
@@ -78,7 +79,7 @@ public class playerController : MonoBehaviour
 
     public bool onRail = false;
     bool onGround = false;
-    bool onRamp = false;
+    public bool onRamp = false;
     bool onPipe = false;
     bool crouched = false;
     bool online = false;
@@ -100,7 +101,11 @@ public class playerController : MonoBehaviour
         // set up camera
         camera = FindObjectOfType<Camera>();
 
+        leftMomentumCtrl = FindObjectOfType<leftMomentumController>();
+        rightMomentumCtrl = FindObjectOfType<rightMomentumController>();
+
         // set up gui stuff
+        /*
         guiRightMarkers = new GameObject[7];
         for (int i=0; i<=6; ++i)
         {
@@ -115,18 +120,7 @@ public class playerController : MonoBehaviour
             // hide each marker
             guiRightMarkers[i].SetActive(false);
         }
-
-        
-        guiLeftMarkers = new GameObject[7];
-        for (int i=0; i<=6; ++i)
-        {
-            guiLeftMarkers[i] = GameObject.FindWithTag("LMarker" + i.ToString());
-            // shift their positions over a bit
-            RectTransform rect = guiLeftMarkers[i].GetComponent<RectTransform>();
-            rect.localPosition = new Vector3(rect.localPosition.x - 20 - 20 * i, rect.localPosition.y, rect.localPosition.z);
-            // hide each marker
-            guiLeftMarkers[i].SetActive(false);
-        }
+        */
 
         spawnCoords = transform.position + Vector3.up;
         spawnRot = transform.rotation;
@@ -145,6 +139,11 @@ public class playerController : MonoBehaviour
     public float GetAccelerationVector()
     {
         return currentAcceleration * accelDir;
+    }
+
+    public int getTrickState()
+    {
+        return (int)trickState;
     }
 
     public float getCurrentVelocity()
@@ -281,6 +280,13 @@ public class playerController : MonoBehaviour
         }
         else
         {
+            if (crouched)
+            {
+                Debug.Log("hit");
+                verticalImpulse -= 10f;
+                currentHVelocity -= 1f;
+            }
+
             // make the amount of upwards speed decrease, eventually becoming negative and add onto gravity's effect
             verticalImpulse -= gravity * Time.deltaTime;
         }
@@ -317,7 +323,6 @@ public class playerController : MonoBehaviour
         if (Mathf.Abs(angle) > 0)
         {
             currentAngularAcceleration = (rb.mass * gravity * (Mathf.Sin(angle * Mathf.Deg2Rad) - Mathf.Cos(angle * Mathf.Deg2Rad) * 1f)) * Time.deltaTime * Mathf.Sign(angle);
-            Debug.Log(Mathf.Sign(angle));
         }
         else
         {
@@ -499,17 +504,6 @@ public class playerController : MonoBehaviour
                         rightMomentum = -1f;
                         leftMomentum = -1f;
                     }
-
-                    // rehide each momentum marker
-                    foreach (GameObject marker in guiRightMarkers)
-                    {
-                        marker.SetActive(false);
-                    }
-
-                    foreach (GameObject marker in guiLeftMarkers)
-                    {
-                        marker.SetActive(false);
-                    }
                 }
                 else
                 {
@@ -519,14 +513,13 @@ public class playerController : MonoBehaviour
                     // increase the right moment for acceleration in right dir
                     if (accelDir > 0 && currentAcceleration > 0)
                     {
-
                         rightMomentum = Mathf.Min(rightMomentum + deltaMomentum, 6f);
                         // display a new marker when rightMomentum is a new whole number
                         if (rightMomentum >= rightMomentumThreshold)
                         {
                             rightMomentumThreshold = Mathf.Clamp(rightMomentumThreshold, 0, 6); // ensure correct data range
                             // display marker
-                            guiRightMarkers[rightMomentumThreshold].SetActive(true);
+                            rightMomentumCtrl.updateMarkers(rightMomentumThreshold, true);
                             ++rightMomentumThreshold;
                         }
 
@@ -534,7 +527,7 @@ public class playerController : MonoBehaviour
                         if (leftMomentum < leftMomentumThreshold)
                         {
                             leftMomentumThreshold = Mathf.Clamp(leftMomentumThreshold, 0, 6); // ensure correct data range
-                            guiLeftMarkers[leftMomentumThreshold].SetActive(false);
+                            leftMomentumCtrl.updateMarkers(leftMomentumThreshold, false);
                             --leftMomentumThreshold;
                         }
                         leftMomentum = Mathf.Max(leftMomentum - deltaDemomentum, 0f); 
@@ -547,7 +540,7 @@ public class playerController : MonoBehaviour
                         if (leftMomentum >= leftMomentumThreshold)
                         {
                             leftMomentumThreshold = Mathf.Clamp(leftMomentumThreshold, 0, 6); // ensure correct data range
-                            guiLeftMarkers[leftMomentumThreshold].SetActive(true);
+                            leftMomentumCtrl.updateMarkers(leftMomentumThreshold, true);
                             ++leftMomentumThreshold;
                         }
 
@@ -555,7 +548,7 @@ public class playerController : MonoBehaviour
                         if (rightMomentum < rightMomentumThreshold)
                         {
                             rightMomentumThreshold = Mathf.Clamp(rightMomentumThreshold, 0, 6); // ensure correct data range
-                            guiRightMarkers[rightMomentumThreshold].SetActive(false);
+                            rightMomentumCtrl.updateMarkers(rightMomentumThreshold, false);
                             --rightMomentumThreshold;
                         }
                         rightMomentum = Mathf.Max(rightMomentum - deltaDemomentum, 0f); 
@@ -568,7 +561,7 @@ public class playerController : MonoBehaviour
                         if (rightMomentum < rightMomentumThreshold)
                         {
                             rightMomentumThreshold = Mathf.Clamp(rightMomentumThreshold, 0, 6); // ensure correct data range
-                            guiRightMarkers[rightMomentumThreshold].SetActive(false);
+                            rightMomentumCtrl.updateMarkers(rightMomentumThreshold, false);
                             --rightMomentumThreshold;
                         }
 
@@ -576,7 +569,7 @@ public class playerController : MonoBehaviour
                         if (leftMomentum < leftMomentumThreshold)
                         {
                             leftMomentumThreshold = Mathf.Clamp(leftMomentumThreshold, 0, 6); // ensure correct data range
-                            guiLeftMarkers[leftMomentumThreshold].SetActive(false);
+                            leftMomentumCtrl.updateMarkers(leftMomentumThreshold, false);
                             --leftMomentumThreshold;
                         }
                     }
@@ -605,10 +598,15 @@ public class playerController : MonoBehaviour
                 }
                 else
                 {
+                    crouched = Input.GetMouseButtonDown(0);
+
                     //transform.rotation = Quaternion.Euler(new Vector3(transform.rotation.x, transform.rotation.y, transform.rotation.z) * (currentSpinRot * Mathf.Deg2Rad));
                     currentSpinRot -= 50 * Time.deltaTime;
 
-                    Debug.Log(currentMouseAccel);
+                    if (crouched)
+                    {
+                        currentSpinRot = 1;
+                    }
                     
                     camera.transform.RotateAround(transform.position, transform.up, currentSpinVector * currentSpinRot * (rotationSpeed / 300) * Time.deltaTime * 2.5f);
 
@@ -708,7 +706,7 @@ public class playerController : MonoBehaviour
 
             if (onPipe)
             {
-                rb.velocity = new Vector3(0, rb.velocity.y + 3f, 0) + transform.up;
+                rb.velocity = new Vector3(0, rb.velocity.y + 3f, 0) - transform.up;
                 currentAcceleration = 0;
                 /*
                 if (verticalImpulse < -1)
@@ -719,7 +717,7 @@ public class playerController : MonoBehaviour
                 */
                 
                  
-                //transform.rotation = Quaternion.Euler(eulers + Vector3.down);
+                transform.rotation = Quaternion.Euler(eulers + Vector3.down);
                 return;
             }
             
