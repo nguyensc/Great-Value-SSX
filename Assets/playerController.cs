@@ -76,6 +76,7 @@ public class playerController : MonoBehaviour
     float spawnAccelDir = 1f;
     float spawnAcceleration = 0f;
     float spawnVerticalImpulse = 0f;
+    trickStates spawnTrickState = trickStates.NONE;
 
     public bool onRail = false;
     bool onGround = false;
@@ -282,7 +283,6 @@ public class playerController : MonoBehaviour
         {
             if (crouched)
             {
-                Debug.Log("HIT");
                 verticalImpulse -= 10f;
                 currentHVelocity -= 5f;
                 currentSpinRot = 1f;
@@ -396,6 +396,7 @@ public class playerController : MonoBehaviour
         spawnAcceleration = currentAcceleration;
         spawnVerticalImpulse = verticalImpulse;
         spawnNormal = groundNormal;
+        spawnTrickState = trickState;
     }
 
     public void Respawn()
@@ -407,6 +408,7 @@ public class playerController : MonoBehaviour
         currentAcceleration = spawnAcceleration;
         verticalImpulse = spawnVerticalImpulse;
         groundNormal = spawnNormal;
+        trickState = spawnTrickState;
     }
 
     void GetInputs()
@@ -583,6 +585,9 @@ public class playerController : MonoBehaviour
                 break;
 
             case (trickStates.SPIN):
+                // ensure no more mouse rotation
+                inputCounter = inputTimer;
+                
                 // rotation work
                 if (currentSpinRot <= 0 || onGround)
                 {
