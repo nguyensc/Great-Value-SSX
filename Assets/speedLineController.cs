@@ -36,26 +36,15 @@ public class speedLineController : MonoBehaviour
     void Update()
     {
 
-        if (player.getCurrentVelocity() > 30)
+        if (player.getCurrentVelocity() > 25)
         {
             if (ps.isStopped)
             {
                 ps.Play();
             }
         }
-        else if (player.getVerticalImpulse() < 0)
-        {
-            if (ps.isStopped)
-           {
-                rotateToUpright();
-                ps.Play();
-            }
-            
-        }
         else if (ps.isPlaying)
         {
-            resetLocalTransform();
-
             ps.Clear();
             ps.Stop();
         }

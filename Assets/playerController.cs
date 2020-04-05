@@ -269,7 +269,7 @@ public class playerController : MonoBehaviour
     {
         if (onGround)
         {
-            if (onRamp || onPipe || onRail)
+            if (onRamp || onPipe)
             {
                 //verticalImpulse += (Mathf.Sin(Mathf.Abs(angle) * Mathf.Deg2Rad) * Mathf.Max(currentHVelocity, 1f)) * Time.deltaTime;
                 verticalImpulse = (Mathf.Sin(Mathf.Abs(angle) * Mathf.Deg2Rad) * Mathf.Max(currentHVelocity, 1f));
