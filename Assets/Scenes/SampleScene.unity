@@ -6932,8 +6932,8 @@ ParticleSystemRenderer:
   m_MinParticleSize: 0
   m_MaxParticleSize: 0.5
   m_CameraVelocityScale: 0
-  m_VelocityScale: 0.01
-  m_LengthScale: 6
+  m_VelocityScale: 0
+  m_LengthScale: 2
   m_SortingFudge: 0
   m_NormalDirection: 1
   m_ShadowBias: 0
@@ -27952,7 +27952,7 @@ PrefabInstance:
     - target: {fileID: 1298450565040777592, guid: 9752fcf3562425c4a9a0dfa0f1945ad0,
         type: 3}
       propertyPath: InitialModule.startSize.scalar
-      value: 0.05
+      value: 0.1
       objectReference: {fileID: 0}
     - target: {fileID: 1298450565040777592, guid: 9752fcf3562425c4a9a0dfa0f1945ad0,
         type: 3}
@@ -28249,6 +28249,21 @@ PrefabInstance:
       propertyPath: ShapeModule.radiusThickness
       value: 0.25
       objectReference: {fileID: 0}
+    - target: {fileID: 2561300024081057803, guid: 9752fcf3562425c4a9a0dfa0f1945ad0,
+        type: 3}
+      propertyPath: m_Mass
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 2561300024081057803, guid: 9752fcf3562425c4a9a0dfa0f1945ad0,
+        type: 3}
+      propertyPath: m_AngularDrag
+      value: 0.05
+      objectReference: {fileID: 0}
+    - target: {fileID: 2561300024081057803, guid: 9752fcf3562425c4a9a0dfa0f1945ad0,
+        type: 3}
+      propertyPath: m_UseGravity
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3512331097575705617, guid: 9752fcf3562425c4a9a0dfa0f1945ad0,
         type: 3}
       propertyPath: m_Name
@@ -28382,7 +28397,7 @@ PrefabInstance:
     - target: {fileID: 7179193021916110699, guid: 9752fcf3562425c4a9a0dfa0f1945ad0,
         type: 3}
       propertyPath: m_LengthScale
-      value: 30
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 7179193021916110699, guid: 9752fcf3562425c4a9a0dfa0f1945ad0,
         type: 3}
