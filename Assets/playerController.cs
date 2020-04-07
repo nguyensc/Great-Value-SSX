@@ -364,13 +364,19 @@ public class playerController : MonoBehaviour
             deltaScore += 25f * Time.deltaTime;
 
             currentNotification = "";
-
-            queuedNotification = "SICK NASTY ROT BROH";
-
+        }
+        else if (sketchy != 0)
+        {
             if (sketchy > 0)
             {
                 queuedNotification = "SKETCHY SPIN GUY";
             }
+            else if (sketchy < 0)
+            {
+                queuedNotification = "SICK NASTY ROT BROH";
+            }
+
+            sketchy = 0;
         }
         // add to main score, pop a notification
         else if (onGround)
@@ -491,6 +497,8 @@ public class playerController : MonoBehaviour
                 break;
             
             case (trickStates.ON_RAMP):
+                sketchy = 0; // reset sketch indicitor
+
                 // reset back to the NONE state if no ramp is detected 
                 if (!onRamp)
                 {
@@ -603,14 +611,18 @@ public class playerController : MonoBehaviour
                     sketchy = 0;
 
                     // if not a smooth landing, reduce velocity
-                    if (Mathf.Abs(Mathf.Abs(camera.transform.rotation.eulerAngles.y) - Mathf.Abs(transform.rotation.eulerAngles.y)) > 30f)
+                    float executedRot = Mathf.Abs(Mathf.Abs(camera.transform.rotation.eulerAngles.y) - Mathf.Abs(transform.rotation.eulerAngles.y));
+                    Debug.Log(executedRot);
+                    if (executedRot > 40f)
                     {
                         sketchy = 1;
                         currentHVelocity /= 2;
                         currentAcceleration /= 2;
+                        Debug.Log("HIT");
                     }
                     else
                     {
+                        sketchy = -1;
                         currentHVelocity *= 1.75f;
                     }
                     //reset the camera rotation
