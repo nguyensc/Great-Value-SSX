@@ -29,6 +29,12 @@ public class playerController : MonoBehaviour
     public float leftMomentum = -1f;
     int rightMomentumThreshold = 0;
     public int leftMomentumThreshold = 0;
+    int sketchy = 0;
+    float score = 0;
+    float deltaScore = 0;
+    string queuedNotification = "";
+
+    string currentNotification = "";
 
     // movement vars
     public float currentMouseAccel = 0f;
@@ -154,6 +160,16 @@ public class playerController : MonoBehaviour
     public bool getDrank()
     {
         return drank;
+    }
+
+    public float getScore()
+    {
+        return score;
+    }
+
+    public string getCurrentNotification()
+    {
+        return currentNotification;
     }
 
     // works like copysign but will return a 0 if the input is 0
@@ -334,6 +350,43 @@ public class playerController : MonoBehaviour
         currentHVelocity = Mathf.Clamp(currentHVelocity, -5, finalVelocity);
     }
 
+    void CalculateScore()
+    {
+        if (onRail)
+        {
+            deltaScore += 15f * Time.deltaTime;
+
+            currentNotification = "";
+            queuedNotification = "MOST BUTTER GRIND BROSYPHILLUS";
+        }
+        else if (trickState == trickStates.SPIN)
+        {
+            deltaScore += 25f * Time.deltaTime;
+
+            currentNotification = "";
+
+            queuedNotification = "SICK NASTY ROT BROH";
+
+            if (sketchy > 0)
+            {
+                queuedNotification = "SKETCHY SPIN GUY";
+            }
+        }
+        // add to main score, pop a notification
+        else if (onGround)
+        {
+
+            // this needs a if stmt to make sure queuedNotification isn't getting overwritten constantly
+            if (deltaScore != 0)
+            {
+                score += deltaScore;
+                deltaScore = 0;
+                currentNotification = queuedNotification;
+                queuedNotification = "";
+            }
+        }
+    }
+
     /*** etc ***/
     public void SetSpawnCoords()
     { 
@@ -372,7 +425,6 @@ public class playerController : MonoBehaviour
         {
             inputCounter -= 1 * Time.deltaTime;
         }
-        
 
         drank = false;
         if (Input.GetKey(KeyCode.Tab) && canDrank && trickState != trickStates.SPIN)
@@ -417,6 +469,9 @@ public class playerController : MonoBehaviour
 
         // get inputs
         GetInputs();
+
+        // calculate the score
+        CalculateScore();
 
         
         // trick state machine
@@ -544,9 +599,13 @@ public class playerController : MonoBehaviour
                     rightMomentumThreshold = (int)rightMomentum + 1;
                     leftMomentumThreshold = (int)leftMomentum + 1;
                     currentSpinRot = 0f;
+
+                    sketchy = 0;
+
                     // if not a smooth landing, reduce velocity
                     if (Mathf.Abs(Mathf.Abs(camera.transform.rotation.eulerAngles.y) - Mathf.Abs(transform.rotation.eulerAngles.y)) > 30f)
                     {
+                        sketchy = 1;
                         currentHVelocity /= 2;
                         currentAcceleration /= 2;
                     }
@@ -662,6 +721,7 @@ public class playerController : MonoBehaviour
         }
         else
         {
+
             transform.rotation = Quaternion.LookRotation(Vector3.Cross(transform.right, groundNormal));
             //transform.rotation = Quaternion.Lerp(transform.rotation, Quaternion.LookRotation(Vector3.Cross(camera.transform.right, groundNormal)), 1f);
         }
