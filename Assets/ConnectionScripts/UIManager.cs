@@ -21,6 +21,10 @@ public class UIManager : MonoBehaviour
 
     AudioSource[] music;
     int currentSong = 0;
+    float mixerNormalVol = -0.03f;
+
+    bool muted = false;
+
 
     public void Start()
     {
@@ -50,6 +54,19 @@ public class UIManager : MonoBehaviour
         {
             Debug.Log("Destroy new instance.");
             Destroy(this);
+        }
+    }
+
+    public void mute()
+    {
+        muted = !muted;
+        if (muted)
+        {
+            masterMixer.SetFloat("vol", -80f);
+        }
+        else
+        {
+            masterMixer.SetFloat("vol", mixerNormalVol);
         }
     }
 
@@ -86,6 +103,13 @@ public class UIManager : MonoBehaviour
         else
         {
             Cursor.lockState = CursorLockMode.Locked;
+        }
+
+        // mvoe to the next song once current song is finished
+        if (!music[currentSong].isPlaying)
+        {
+            currentSong = (currentSong + 1) % music.Length;
+            music[currentSong].Play();
         }
 
         if (pCtrl.paused && !c.enabled)

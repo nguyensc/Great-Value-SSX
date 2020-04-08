@@ -19,7 +19,8 @@ public class playerController : MonoBehaviour
         NONE,
         ON_RAMP,
         SETUP_SPIN,
-        SPIN
+        SPIN, 
+        ON_PIPE
     }
     public trickStates trickState;
     public int spinCounter = 0;
@@ -54,6 +55,8 @@ public class playerController : MonoBehaviour
     float inputCounter = 0.005f;
     float rotx = 0f;
     float roty = 0f;
+
+    float zPipeRotation = 0f;
 
     float initialVelocity = 0f;
     float finalVelocity = 100f;
@@ -228,7 +231,7 @@ public class playerController : MonoBehaviour
         
         Debug.DrawRay(r.origin, r.direction, Color.magenta, 1f); 
         
-        if (Physics.Raycast(camera.transform.position + camera.transform.up * 0.1f, -camera.transform.up, out RaycastHit hit, 1f)){
+        if (Physics.Raycast(transform.position + camera.transform.up * 0.1f, -camera.transform.up, out RaycastHit hit, 1f)){
             onGround = true;
             onPipe = false;
             groundNormal = hit.normal;
@@ -618,7 +621,6 @@ public class playerController : MonoBehaviour
                         sketchy = 1;
                         currentHVelocity /= 2;
                         currentAcceleration /= 2;
-                        Debug.Log("HIT");
                     }
                     else
                     {
@@ -645,6 +647,9 @@ public class playerController : MonoBehaviour
                     return;
                 }
                 break; 
+            
+            case (trickStates.ON_PIPE):
+                break;
         }
         
         // precalculate any values affected by the player's current angle
@@ -716,25 +721,18 @@ public class playerController : MonoBehaviour
             
             Vector3 eulers = this.transform.rotation.eulerAngles;
 
-            if (onPipe)
-            {
-                rb.velocity = new Vector3(0, rb.velocity.y + 3f, 0) - transform.up;
-                currentAcceleration = 0;               
-                 
-                transform.rotation = Quaternion.Euler(eulers + Vector3.down);
-                return;
-            }
-            
             // slowly rotate forwards while in the air            
             float newEulerX = Mathf.Min(eulers.x + 3f * Time.deltaTime, maxAirRotation);
 
             Quaternion newRotation = Quaternion.Euler(new Vector3(newEulerX,eulers.y,eulers.z));
             transform.rotation = Quaternion.Lerp(transform.rotation, newRotation, 0.25f);
+            
         }
         else
         {
-
             transform.rotation = Quaternion.LookRotation(Vector3.Cross(transform.right, groundNormal));
+            Vector3 eulers = transform.localEulerAngles;
+            transform.rotation = Quaternion.Euler(eulers.x, eulers.y, 0);
             //transform.rotation = Quaternion.Lerp(transform.rotation, Quaternion.LookRotation(Vector3.Cross(camera.transform.right, groundNormal)), 1f);
         }
     }
