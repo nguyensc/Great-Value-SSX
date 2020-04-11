@@ -20,7 +20,9 @@ public class playerController : MonoBehaviour
         ON_RAMP,
         SETUP_SPIN,
         SPIN, 
-        ON_PIPE
+        ON_PIPE,
+        AIR_OFF_PIPE,
+        LAND_ON_PIPE
     }
     public trickStates trickState;
     public int spinCounter = 0;
@@ -30,10 +32,14 @@ public class playerController : MonoBehaviour
     public float leftMomentum = -1f;
     int rightMomentumThreshold = 0;
     public int leftMomentumThreshold = 0;
+
+    Vector3 currentPipeRotation;
+    Vector3 currentPipePos;
     int sketchy = 0;
     float score = 0;
     float deltaScore = 0;
     string queuedNotification = "";
+    bool hasRotatedOffPipe = false;
 
     string currentNotification = "";
 
@@ -56,8 +62,6 @@ public class playerController : MonoBehaviour
     float rotx = 0f;
     float roty = 0f;
 
-    float zPipeRotation = 0f;
-
     float initialVelocity = 0f;
     float finalVelocity = 100f;
     float currentHVelocity = 0f;
@@ -68,6 +72,7 @@ public class playerController : MonoBehaviour
     float currentAcceleration = 0f;
     float currentAngularAcceleration = 0f;
     float deceleration = 30f;
+    float tempHVelocity = 0f;
     
     // non trick-momentum vars
     float momentum = 0f;
@@ -231,7 +236,7 @@ public class playerController : MonoBehaviour
         
         Debug.DrawRay(r.origin, r.direction, Color.magenta, 1f); 
         
-        if (Physics.Raycast(transform.position + camera.transform.up * 0.1f, -camera.transform.up, out RaycastHit hit, 1f)){
+        if (Physics.Raycast(transform.position + transform.up * 0.1f, -transform.up, out RaycastHit hit, 1f)){
             onGround = true;
             onPipe = false;
             groundNormal = hit.normal;
@@ -497,6 +502,15 @@ public class playerController : MonoBehaviour
                     leftMomentumThreshold = (int)leftMomentum + 1;
                     trickState = trickStates.ON_RAMP;
                 }
+                // or whenever the player is on a ramp
+                else if (onPipe)
+                {
+                    hasRotatedOffPipe = false;
+                    currentPipePos = transform.position; // reset the known position for being on a pipe
+                    currentPipeRotation = transform.localEulerAngles; // reset the euler angles
+                    tempHVelocity = currentHVelocity;
+                    trickState = trickStates.ON_PIPE;
+                }
                 break;
             
             case (trickStates.ON_RAMP):
@@ -625,7 +639,7 @@ public class playerController : MonoBehaviour
                     else
                     {
                         sketchy = -1;
-                        currentHVelocity *= 1.75f;
+                        currentHVelocity += 3f;
                     }
                     //reset the camera rotation
                     camera.transform.rotation = transform.rotation;
@@ -649,6 +663,72 @@ public class playerController : MonoBehaviour
                 break; 
             
             case (trickStates.ON_PIPE):
+                if (!onGround)
+                {
+                    trickState = trickStates.AIR_OFF_PIPE;
+                }
+                else
+                {
+                    currentPipePos = transform.localPosition; // reset the known position for being on a pipe
+                    currentPipeRotation = transform.localEulerAngles; // update the euler angles
+                }
+                break;
+            
+            case (trickStates.AIR_OFF_PIPE):
+                if (!onGround)
+                {
+                    if (currentMouseAccel > 0.5f || hasRotatedOffPipe)
+                    {
+                        hasRotatedOffPipe = true;
+                        transform.RotateAround(transform.position, transform.up, 25 * Time.deltaTime);
+                        rb.velocity = (Vector3.down * verticalImpulse - Vector3.down * rb.mass); 
+                    }
+                    else
+                    {
+                        transform.localRotation = Quaternion.Euler(270, currentPipeRotation.y, currentPipeRotation.z);
+                        currentHVelocity = 3f;
+                        rb.velocity = (transform.forward * verticalImpulse - transform.forward * rb.mass); 
+                    }
+
+                    
+                    CalculateVerticalImpulse();
+
+                    return;
+                }
+                else if (verticalImpulse <= -1)
+                {
+                    if (onGround)
+                    {
+                        if (onPipe)
+                        {
+                        trickState = trickStates.LAND_ON_PIPE;
+                        }
+                        else
+                        {
+                            trickState = trickStates.NONE;
+                        }
+                    }
+                }              
+                break;
+            
+            case (trickStates.LAND_ON_PIPE):
+                angle = Vector3.SignedAngle(Vector3.up, groundNormal, transform.right);
+                if (angle < 0)
+                {
+                    Debug.Log("HIT");
+                    currentHVelocity = -tempHVelocity;
+                    rb.velocity = -transform.forward * 3;
+                }
+
+                transform.rotation = Quaternion.LookRotation(Vector3.Cross(transform.right, groundNormal));
+
+
+                if (!onPipe)
+                {
+                    trickState = trickStates.NONE;
+                }
+
+                return;
                 break;
         }
         
@@ -731,8 +811,7 @@ public class playerController : MonoBehaviour
         else
         {
             transform.rotation = Quaternion.LookRotation(Vector3.Cross(transform.right, groundNormal));
-            Vector3 eulers = transform.localEulerAngles;
-            transform.rotation = Quaternion.Euler(eulers.x, eulers.y, 0);
+
             //transform.rotation = Quaternion.Lerp(transform.rotation, Quaternion.LookRotation(Vector3.Cross(camera.transform.right, groundNormal)), 1f);
         }
     }
